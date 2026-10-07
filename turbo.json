@@ -20,7 +20,7 @@
     },
     "test": {
       "dependsOn": ["^build"],
-      "outputs": ["coverage/**"],
+      "outputs": [],
       "passThroughEnv": ["DATABASE_URL", "TEST_DATABASE_URL", "CLICKHOUSE_*", "REDIS_URL", "SMTP_*"]
     },
     "dev": {
