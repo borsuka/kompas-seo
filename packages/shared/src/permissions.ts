@@ -23,6 +23,8 @@ export const STATEMENTS = {
   billing: ['read', 'manage'],
   apiKey: ['read', 'manage'],
   report: ['read', 'create'],
+  /** Running research that queries data providers and spends credits. */
+  research: ['run'],
 } as const;
 
 export type Resource = keyof typeof STATEMENTS;
@@ -54,6 +56,7 @@ export const ROLE_GRANTS: Record<Role, Grants> = {
     billing: ['read'],
     apiKey: all('apiKey'),
     report: all('report'),
+    research: all('research'),
   },
   member: {
     organization: ['read'],
@@ -63,6 +66,7 @@ export const ROLE_GRANTS: Record<Role, Grants> = {
     job: all('job'),
     credits: ['read'],
     report: all('report'),
+    research: all('research'),
   },
   viewer: readOnly,
 };

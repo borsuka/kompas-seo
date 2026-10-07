@@ -99,6 +99,8 @@ export const apiEnvSchema = commonEnvSchema
     GOOGLE_CLIENT_SECRET: optionalString,
     BILLING_ENABLED: bool,
     RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(300),
+    ANTHROPIC_API_KEY: optionalString,
+    ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
   });
 export type ApiEnv = z.infer<typeof apiEnvSchema>;
 

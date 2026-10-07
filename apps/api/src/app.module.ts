@@ -15,6 +15,8 @@ import { HealthModule } from './health/health.controller.js';
 import { InfraModule } from './infra/infra.module.js';
 import { REDIS } from './infra/tokens.js';
 import { JobsModule } from './jobs/jobs.module.js';
+import { KeywordsModule } from './keywords/keywords.module.js';
+import { LlmModule } from './llm/llm.module.js';
 import { OrganizationsModule } from './organizations/organizations.module.js';
 import { ProjectsModule } from './projects/projects.module.js';
 import { ProvidersModule } from './providers/providers.module.js';
@@ -57,6 +59,8 @@ const env = loadApiEnv();
     OrganizationsModule,
     ProjectsModule,
     JobsModule,
+    LlmModule,
+    KeywordsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AppErrorFilter },

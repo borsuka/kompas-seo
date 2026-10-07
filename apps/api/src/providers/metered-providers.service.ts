@@ -6,7 +6,7 @@ import {
   type ProviderKind,
   type ProviderSet,
 } from '@seo/data-providers';
-import { computeCreditCost, resolveCreditCosts } from '@seo/shared';
+import { computeCreditCost, resolveCreditCosts, type ProviderOperation } from '@seo/shared';
 import { API_ENV, type ApiEnv } from '../config/env.js';
 import { CreditsService } from '../credits/credits.service.js';
 import { PROVIDERS } from '../infra/tokens.js';
@@ -78,5 +78,42 @@ export class MeteredProviders {
           () => impl.apply(this.providers[kind], args),
         ),
     );
+  }
+
+  /** Credits of a composite operation (several provider calls priced as one). */
+  priceOf(operation: ProviderOperation, units = 1): number {
+    return computeCreditCost(this.costs[operation], units);
+  }
+
+  /**
+   * Charges one composite operation, then runs `fn` with direct access to the
+   * (cached, usage-recorded) providers. Refunds if `fn` throws.
+   */
+  async bundle<T>(
+    ctx: CallerContext,
+    operation: ProviderOperation,
+    units: number,
+    fn: (providers: ProviderSet) => Promise<T>,
+  ): Promise<T> {
+    return this.credits.withCharge(
+      {
+        organizationId: ctx.organizationId,
+        userId: ctx.userId ?? null,
+        description: operation,
+        refType: 'provider',
+        refId: operation,
+      },
+      this.priceOf(operation, units),
+      () =>
+        withProviderContext(
+          { orgId: ctx.organizationId, userId: ctx.userId ?? null, requestId: ctx.requestId },
+          () => fn(this.providers),
+        ),
+    );
+  }
+
+  /** Name of the implementation serving a data type (e.g. "mock", "dataforseo"). */
+  providerName(kind: ProviderKind): string {
+    return this.providers[kind].name;
   }
 }
