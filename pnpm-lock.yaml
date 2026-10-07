@@ -297,6 +297,34 @@ importers:
         specifier: ^2.0.0
         version: 2.0.0(@swc/core@1.16.13)(esbuild@0.28.2)(rolldown@1.2.12)(vite@8.3.3(@types/node@24.19.1)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.1))
 
+  apps/worker:
+    dependencies:
+      '@seo/data-providers':
+        specifier: workspace:*
+        version: link:../../packages/data-providers
+      '@seo/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      '@seo/shared':
+        specifier: workspace:*
+        version: link:../../packages/shared
+      bullmq:
+        specifier: ^6.3.11
+        version: 6.3.11(ioredis@6.0.0(supports-color@8.1.1))(pg@8.23.1)
+      ioredis:
+        specifier: ^6.0.0
+        version: 6.0.0(supports-color@8.1.1)
+      pino:
+        specifier: ^10.4.0
+        version: 10.4.0
+    devDependencies:
+      '@seo/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      pino-pretty:
+        specifier: ^13.2.0
+        version: 13.2.0
+
   packages/config: {}
 
   packages/data-providers:
