@@ -1,9 +1,7 @@
-import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  // SWC emits decorator metadata, which Nest's dependency injection relies on.
-  plugins: [swc.vite({ module: { type: 'es6' } })],
+  // Vite's oxc transform honours tsconfig `emitDecoratorMetadata`, which Nest DI needs.
   test: {
     include: ['src/**/*.test.ts', 'test/**/*.test.ts'],
     environment: 'node',
