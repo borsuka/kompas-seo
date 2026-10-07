@@ -67,7 +67,7 @@ export const providerEnvSchema = z.object({
 
 export const emailEnvSchema = z.object({
   SMTP_HOST: z.string().default('localhost'),
-  SMTP_PORT: z.coerce.number().int().default(1025),
+  SMTP_PORT: z.coerce.number().int().default(11025),
   SMTP_USER: optionalString,
   SMTP_PASSWORD: optionalString,
   SMTP_SECURE: bool,

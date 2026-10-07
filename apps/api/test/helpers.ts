@@ -2,7 +2,7 @@ import type { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import type TestAgent from 'supertest/lib/agent.js';
 import { truncateAll } from '@seo/db/testing';
-import type { Database } from '@seo/db';
+import { eq, schema, type Database } from '@seo/db';
 import { DB } from '../src/infra/tokens.js';
 
 export const ORIGIN = process.env.APP_URL ?? 'http://localhost:3000';
@@ -54,4 +54,9 @@ export async function signUpWithOrg(app: INestApplication, orgName = 'Acme') {
   if (res.status !== 201)
     throw new Error(`create org failed: ${res.status} ${JSON.stringify(res.body)}`);
   return { ...user, orgId: res.body.id as string };
+}
+
+/** Marks an email as verified (what clicking the verification link does). */
+export async function verifyEmail(db: Database, email: string) {
+  await db.update(schema.user).set({ emailVerified: true }).where(eq(schema.user.email, email));
 }

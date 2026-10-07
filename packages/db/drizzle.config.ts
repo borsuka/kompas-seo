@@ -11,7 +11,7 @@ export default defineConfig({
   // Compiled output: drizzle-kit cannot resolve `.js` specifiers in TS sources.
   schema: './dist/schema/index.js',
   out: './drizzle',
-  dbCredentials: { url: process.env.DATABASE_URL ?? 'postgres://seo:seo@localhost:5432/seo' },
+  dbCredentials: { url: process.env.DATABASE_URL ?? 'postgres://seo:seo@localhost:15432/seo' },
   strict: true,
   verbose: true,
 });

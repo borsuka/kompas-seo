@@ -54,7 +54,8 @@ export function createAuth({ env, db, mailer, onError }: AuthDeps) {
     session: {
       expiresIn: 60 * 60 * 24 * 30,
       updateAge: 60 * 60 * 24,
-      cookieCache: { enabled: true, maxAge: 60 },
+      // No cookie cache: the active organization must update immediately after switching.
+      cookieCache: { enabled: false },
     },
     emailAndPassword: {
       enabled: true,
@@ -86,6 +87,8 @@ export function createAuth({ env, db, mailer, onError }: AuthDeps) {
         allowUserToCreateOrganization: true,
         invitationExpiresIn: 60 * 60 * 24 * 7,
         cancelPendingInvitationsOnReInvite: true,
+        // An invitation proves nothing unless the invitee owns the address.
+        requireEmailVerificationOnInvitation: true,
         sendInvitationEmail: async ({ id, email, role, organization: org, inviter }) => {
           const locale = localeOf(inviter.user);
           const url = `${env.APP_URL}${localePath(locale)}/invitations/${id}`;

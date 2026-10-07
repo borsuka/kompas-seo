@@ -24,7 +24,7 @@ pnpm dev
 | ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | http://localhost:3000                                                  | Web app (Bulgarian; English under `/en`)                                    |
 | http://localhost:4000/docs                                             | API reference (Swagger)                                                     |
-| http://localhost:8025                                                  | Mailpit: every email the app sends (verification, magic links, invitations) |
+| http://localhost:18025                                                 | Mailpit: every email the app sends (verification, magic links, invitations) |
 | http://localhost:4000/health/ready, http://localhost:4001/health/ready | Health of API and worker                                                    |
 
 ### Demo account

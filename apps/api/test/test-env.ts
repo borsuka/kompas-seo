@@ -5,10 +5,10 @@ export function applyTestEnv() {
   loadRootEnv();
   const env = process.env;
   env.NODE_ENV = 'test';
-  env.DATABASE_URL = env.TEST_DATABASE_URL ?? 'postgres://seo:seo@localhost:5432/seo_test';
+  env.DATABASE_URL = env.TEST_DATABASE_URL ?? 'postgres://seo:seo@localhost:15432/seo_test';
   env.CLICKHOUSE_DATABASE = env.CLICKHOUSE_TEST_DATABASE ?? 'seo_test';
   // Redis logical DB 15 is reserved for tests.
-  const redis = new URL(env.REDIS_URL ?? 'redis://localhost:6379');
+  const redis = new URL(env.REDIS_URL ?? 'redis://localhost:16379');
   redis.pathname = '/15';
   env.REDIS_URL = redis.toString();
   env.AUTH_REQUIRE_EMAIL_VERIFICATION = 'false';

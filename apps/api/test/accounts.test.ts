@@ -6,6 +6,7 @@ import {
   signUpWithOrg,
   startApp,
   uniqueEmail,
+  verifyEmail,
   type TestApp,
 } from './helpers.js';
 
@@ -72,6 +73,7 @@ describe('Acceptance 3.1: accounts, organizations, projects and roles', () => {
 
     // 5. Viewer signs up and accepts
     const viewer = await signUp(t.app, { email: viewerEmail, name: 'Viewer' });
+    await verifyEmail(t.db, viewerEmail);
     const details = await viewer.agent.get(`/api/v1/invitations/${invite.body.id}`).expect(200);
     expect(details.body).toMatchObject({ organizationName: 'Агенция Акме', role: 'viewer' });
     await viewer.agent.post(`/api/v1/invitations/${invite.body.id}/accept`).expect(201);
@@ -123,6 +125,7 @@ describe('Acceptance 3.1: accounts, organizations, projects and roles', () => {
       .send({ email, role: 'member' })
       .expect(201);
     const member = await signUp(t.app, { email });
+    await verifyEmail(t.db, email);
     await member.agent.post(`/api/v1/invitations/${inv.body.id}/accept`).expect(201);
 
     const members = await owner.agent.get('/api/v1/organization/members').expect(200);

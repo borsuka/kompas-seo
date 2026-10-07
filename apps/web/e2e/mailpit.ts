@@ -1,5 +1,5 @@
 /** Reads emails sent by the app from Mailpit (local SMTP catcher). */
-const MAILPIT = process.env.MAILPIT_URL ?? 'http://localhost:8025';
+const MAILPIT = process.env.MAILPIT_URL ?? 'http://localhost:18025';
 
 interface MailpitSearch {
   messages: { ID: string; Subject: string; To: { Address: string }[] }[];
