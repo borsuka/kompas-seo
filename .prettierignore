@@ -1,0 +1,8 @@
+pnpm-lock.yaml
+dist
+.next
+coverage
+.turbo
+**/drizzle/meta
+playwright-report
+test-results
