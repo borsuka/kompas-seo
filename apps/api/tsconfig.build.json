@@ -1,0 +1,4 @@
+{
+  "extends": "@seo/config/tsconfig/nest.json",
+  "exclude": ["src/**/*.test.ts", "dist"]
+}

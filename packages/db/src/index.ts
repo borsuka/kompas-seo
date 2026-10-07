@@ -24,3 +24,4 @@ export {
   type InferSelectModel,
   type SQL,
 } from 'drizzle-orm';
+export * from './ops/index.js';
