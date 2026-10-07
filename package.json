@@ -20,7 +20,7 @@
     "services:down": "docker compose down",
     "db:generate": "pnpm --filter @seo/db db:generate",
     "db:migrate": "pnpm --filter @seo/db db:migrate",
-    "db:seed": "pnpm --filter @seo/db db:seed",
+    "db:seed": "pnpm --filter @seo/api db:seed",
     "prepare": "husky"
   },
   "devDependencies": {
