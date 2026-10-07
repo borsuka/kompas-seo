@@ -8,5 +8,5 @@
     "incremental": true
   },
   "include": ["${configDir}/src"],
-  "exclude": ["${configDir}/src/**/*.test.ts", "${configDir}/dist"]
+  "exclude": ["${configDir}/dist"]
 }
