@@ -18,8 +18,9 @@ export function CardHeader({ className, ...props }: React.ComponentProps<'div'>)
   return <div className={cn('flex flex-col gap-1.5 p-5 pb-3', className)} {...props} />;
 }
 
-export function CardTitle({ className, ...props }: React.ComponentProps<'h3'>) {
-  return <h3 className={cn('text-base leading-tight font-semibold', className)} {...props} />;
+/** Visual title only: put the semantic heading (h1/h2…) inside so the outline stays correct. */
+export function CardTitle({ className, ...props }: React.ComponentProps<'div'>) {
+  return <div className={cn('text-base leading-tight font-semibold', className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: React.ComponentProps<'p'>) {

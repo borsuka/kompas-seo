@@ -1,7 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { magicLink, organization } from 'better-auth/plugins';
-import { bootstrapOrganization, eq, schema, type Database } from '@seo/db';
+import { asc, bootstrapOrganization, eq, schema, type Database } from '@seo/db';
 import { UI_LOCALES, type UiLocale } from '@seo/shared';
 import type { ApiEnv } from '../config/env.js';
 import type { Mailer } from '../email/mailer.js';
@@ -74,6 +74,24 @@ export function createAuth({ env, db, mailer, onError }: AuthDeps) {
       },
     },
     socialProviders: google,
+    databaseHooks: {
+      session: {
+        create: {
+          // New sessions start in the user's oldest organization (if any).
+          before: async (session) => {
+            const [membership] = await db
+              .select({ organizationId: schema.member.organizationId })
+              .from(schema.member)
+              .where(eq(schema.member.userId, session.userId))
+              .orderBy(asc(schema.member.createdAt))
+              .limit(1);
+            return {
+              data: { ...session, activeOrganizationId: membership?.organizationId ?? null },
+            };
+          },
+        },
+      },
+    },
     rateLimit: { enabled: env.NODE_ENV === 'production', window: 60, max: 100 },
     advanced: {
       useSecureCookies: env.APP_URL.startsWith('https://'),

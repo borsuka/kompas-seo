@@ -5,9 +5,9 @@ const PASSWORD = 'correct-horse-battery';
 
 async function signUpAndVerify(page: Page, name: string, email: string) {
   await page.goto('/sign-up');
-  await page.getByLabel('Име').fill(name);
-  await page.getByLabel('Имейл').fill(email);
-  await page.getByLabel('Парола').fill(PASSWORD);
+  await page.getByLabel('Име', { exact: true }).fill(name);
+  await page.getByLabel('Имейл', { exact: true }).fill(email);
+  await page.getByLabel('Парола', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Регистрация' }).click();
 
   // Email verification is required: follow the link from the email.
@@ -30,11 +30,11 @@ test('acceptance 3.1: sign up, create org and project, invite a read-only viewer
   await expect(
     owner.getByRole('heading', { name: 'Как се казва вашата организация?' }),
   ).toBeVisible();
-  await owner.getByLabel('Име на организацията').fill('Агенция Е2Е');
+  await owner.getByLabel('Име на организацията', { exact: true }).fill('Агенция Е2Е');
   await owner.getByRole('button', { name: 'Създай' }).click();
 
   await expect(owner.getByRole('heading', { name: 'Добавете своя сайт' })).toBeVisible();
-  await owner.getByLabel('Домейн').fill('https://www.primer-e2e.bg/');
+  await owner.getByLabel('Домейн', { exact: true }).fill('https://www.primer-e2e.bg/');
   await owner.getByRole('button', { name: 'Към таблото' }).click();
 
   await expect(owner.getByRole('heading', { name: 'Табло' })).toBeVisible();
@@ -46,7 +46,7 @@ test('acceptance 3.1: sign up, create org and project, invite a read-only viewer
   await owner.getByRole('combobox', { name: 'Членове' }).click();
   await owner.getByRole('option', { name: 'Наблюдател' }).click();
   await owner.getByRole('button', { name: 'Покани' }).click();
-  await expect(owner.getByText(viewerEmail)).toBeVisible();
+  await expect(owner.getByRole('listitem').filter({ hasText: viewerEmail })).toBeVisible();
 
   // --- Viewer: sign up from the invitation email and accept
   const inviteLink = await waitForEmailLink(viewerEmail, '/invitations/');
@@ -60,7 +60,7 @@ test('acceptance 3.1: sign up, create org and project, invite a read-only viewer
   // --- Viewer sees the project but cannot edit
   await viewer.goto('/app/settings?tab=project');
   await expect(viewer.getByText('Имате права само за преглед')).toBeVisible();
-  await expect(viewer.getByLabel('Име на проекта')).toBeDisabled();
+  await expect(viewer.getByLabel('Име на проекта', { exact: true })).toBeDisabled();
   await expect(viewer.getByRole('button', { name: 'Запази' })).toBeDisabled();
   await expect(viewer.getByRole('button', { name: 'Изтрий проекта' })).toHaveCount(0);
 
