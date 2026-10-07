@@ -11,6 +11,8 @@ import { withDedup } from './middleware/dedup.js';
 import { withRetry, type RetryOptions } from './middleware/retry.js';
 import type { Middleware } from './middleware/types.js';
 import { withUsageRecording } from './middleware/usage.js';
+import { DataForSeoClient } from './dataforseo/client.js';
+import { DataForSeoProvider } from './dataforseo/dataforseo-provider.js';
 import { MockProvider } from './mock/mock-provider.js';
 import type { ProviderKind, ProviderSet } from './types.js';
 import type { UsageSink } from './usage.js';
@@ -23,6 +25,9 @@ export interface ProviderEnv {
   DOMAIN_PROVIDER: ProviderImpl;
   BACKLINK_PROVIDER: ProviderImpl;
   CREDIT_COSTS_JSON?: string | undefined;
+  DATAFORSEO_LOGIN?: string | undefined;
+  DATAFORSEO_PASSWORD?: string | undefined;
+  DATAFORSEO_SANDBOX?: boolean | undefined;
 }
 
 export interface CreateProvidersOptions {
@@ -44,19 +49,26 @@ const ENV_KEY: Record<ProviderKind, keyof ProviderEnv> = {
   backlinks: 'BACKLINK_PROVIDER',
 };
 
+/** DataForSEO implementations available so far (domains: Phase 2, backlinks: Phase 4). */
+const DATAFORSEO_KINDS = new Set<ProviderKind>(['keywords', 'serp']);
+
 function rawProvider<K extends ProviderKind>(
   kind: K,
   impl: ProviderImpl,
   mock: MockProvider,
+  dataForSeo: () => DataForSeoProvider,
 ): ProviderSet[K] {
   switch (impl) {
     case 'mock':
       return mock as ProviderSet[K];
     case 'dataforseo':
-      throw new AppError(
-        'PROVIDER_NOT_CONFIGURED',
-        `DataForSEO provider for "${kind}" is not implemented yet. Set ${ENV_KEY[kind]}=mock.`,
-      );
+      if (!DATAFORSEO_KINDS.has(kind)) {
+        throw new AppError(
+          'PROVIDER_NOT_CONFIGURED',
+          `DataForSEO provider for "${kind}" is not implemented yet. Set ${ENV_KEY[kind]}=mock.`,
+        );
+      }
+      return dataForSeo() as unknown as ProviderSet[K];
   }
 }
 
@@ -69,13 +81,23 @@ function rawProvider<K extends ProviderKind>(
 export function createProviders(opts: CreateProvidersOptions): ProviderSet {
   const creditCosts = resolveCreditCosts(opts.env.CREDIT_COSTS_JSON);
   const mock = new MockProvider();
+  let dfs: DataForSeoProvider | null = null;
+  const dataForSeo = () =>
+    (dfs ??= new DataForSeoProvider(
+      new DataForSeoClient({
+        login: opts.env.DATAFORSEO_LOGIN ?? '',
+        password: opts.env.DATAFORSEO_PASSWORD ?? '',
+        sandbox: opts.env.DATAFORSEO_SANDBOX ?? false,
+      }),
+    ));
   const onStateChange = (state: BreakerState, provider: string) =>
     opts.logger?.warn({ provider, state }, 'provider circuit breaker state changed');
   const onCacheError = (err: unknown) => opts.logger?.warn({ err }, 'provider cache error');
 
   const build = <K extends ProviderKind>(kind: K): ProviderSet[K] => {
     const impl =
-      opts.overrides?.[kind] ?? rawProvider(kind, opts.env[ENV_KEY[kind]] as ProviderImpl, mock);
+      opts.overrides?.[kind] ??
+      rawProvider(kind, opts.env[ENV_KEY[kind]] as ProviderImpl, mock, dataForSeo);
     const breaker = new CircuitBreaker(`${impl.name}:${kind}`, { onStateChange });
     const chain: Middleware[] = [
       withUsageRecording(opts.usage, creditCosts),
