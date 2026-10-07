@@ -10,6 +10,10 @@ export const PROVIDER_OPERATIONS = [
   'backlink.summary',
   'backlink.list',
   'backlink.referringDomains',
+  /** Keyword Overview: backlink + ranking metrics of the top-10 pages (one composite charge). */
+  'serp.pageMetrics',
+  /** SERP top 10 fetched for clustering, per keyword without a stored SERP. */
+  'keyword.clusterSerp',
 ] as const;
 export const providerOperationSchema = z.enum(PROVIDER_OPERATIONS);
 export type ProviderOperation = z.infer<typeof providerOperationSchema>;
@@ -33,6 +37,8 @@ export const DEFAULT_CREDIT_COSTS: Record<ProviderOperation, CreditCost> = {
   'backlink.summary': { base: 5, perUnit: 0, unitSize: 1 },
   'backlink.list': { base: 5, perUnit: 1, unitSize: 100 },
   'backlink.referringDomains': { base: 5, perUnit: 1, unitSize: 100 },
+  'serp.pageMetrics': { base: 10, perUnit: 0, unitSize: 1 },
+  'keyword.clusterSerp': { base: 0, perUnit: 1, unitSize: 1 },
 };
 
 const creditCostSchema = z.object({

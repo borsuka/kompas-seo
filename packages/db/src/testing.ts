@@ -10,7 +10,7 @@ export async function truncateAll(db: Database): Promise<void> {
   }
   await db.execute(sql`
     truncate table
-      audit_log, jobs, credit_ledger, org_credit_balances, subscriptions,
+      keyword_list_items, keyword_lists, audit_log, jobs, credit_ledger, org_credit_balances, subscriptions,
       project_competitors, projects, invitation, member, organization,
       verification, account, session, "user"
     restart identity cascade

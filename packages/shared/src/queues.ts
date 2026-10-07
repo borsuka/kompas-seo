@@ -4,18 +4,31 @@ import { z } from 'zod';
 export const QUEUES = {
   system: 'system',
   credits: 'credits',
+  keywords: 'keywords',
 } as const;
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
 
 /** Job types tracked in the Postgres `jobs` table and visible to users. */
-export const JOB_TYPES = ['system.demo-progress', 'credits.monthly-grant'] as const;
+export const JOB_TYPES = [
+  'system.demo-progress',
+  'credits.monthly-grant',
+  'keywords.cluster',
+] as const;
 export const jobTypeSchema = z.enum(JOB_TYPES);
 export type JobType = z.infer<typeof jobTypeSchema>;
 
 export const JOB_QUEUE: Record<JobType, QueueName> = {
   'system.demo-progress': QUEUES.system,
   'credits.monthly-grant': QUEUES.credits,
+  'keywords.cluster': QUEUES.keywords,
 };
+
+export interface ClusterJobInput {
+  listId: string;
+  minSharedUrls: number;
+  /** Credits charged up front; refunded if the job finally fails. */
+  creditsCharged: number;
+}
 
 export const JOB_STATUSES = ['queued', 'running', 'completed', 'failed', 'cancelled'] as const;
 export const jobStatusSchema = z.enum(JOB_STATUSES);
