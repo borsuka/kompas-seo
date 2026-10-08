@@ -89,6 +89,39 @@ function vocabFor(loc: Locale, text = ''): Vocabulary {
   return loc.languageCode === 'bg' || /[Ѐ-ӿ]/.test(text) ? VOCAB_BG : VOCAB_EN;
 }
 
+/** Size of the shared pool of fictional referring domains. */
+const LINK_POOL_SIZE = 4000;
+const SPAM_STEMS = [
+  'free-links',
+  'seo-backlinks',
+  'casino-bonus',
+  'cheap-pills',
+  'link-directory',
+  'bet-tips',
+];
+const SPAM_TLDS = ['xyz', 'top', 'click', 'icu', 'buzz'];
+
+/** Every 23rd pool domain is a spammy site. */
+const isSpamPoolIndex = (i: number) => i % 23 === 7;
+
+function linkPoolDomain(i: number): string {
+  const r = createRng(`pool|${i}`);
+  if (isSpamPoolIndex(i)) return `${r.pick(SPAM_STEMS)}-${i}.${r.pick(SPAM_TLDS)}`;
+  return `${r.pick(LINK_SOURCE_STEMS)}-${r.pick(LINK_SOURCE_STEMS)}${i}.${r.pick([...TLDS_BG, 'com'])}`;
+}
+
+function linkPoolRating(i: number): number {
+  if (isSpamPoolIndex(i)) return createRng(`pool-r|${i}`).int(0, 8);
+  // Popular (low index) domains have higher ratings.
+  const base = 85 * Math.exp(-i / 900);
+  return Math.round(clamp(base + createRng(`pool-r|${i}`).normal() * 6 + 3, 0, 100));
+}
+
+function linkPoolSpam(i: number): number {
+  const r = createRng(`pool-s|${i}`);
+  return isSpamPoolIndex(i) ? r.int(55, 95) : r.int(0, 25);
+}
+
 function clamp(v: number, min: number, max: number) {
   return Math.min(max, Math.max(min, v));
 }
@@ -695,6 +728,9 @@ export class MockProvider
       brokenBacklinks: Math.round(
         backlinks * (rows.filter((r) => r.targetStatus === 404).length / Math.max(1, rows.length)),
       ),
+      spamScore: Math.round(
+        rows.reduce((sum, r) => sum + (r.spamScore ?? 0), 0) / Math.max(1, rows.length),
+      ),
       updatedAt: this.now().toISOString(),
     };
   }
@@ -732,6 +768,9 @@ export class MockProvider
         .map((l) => l.lastSeen)
         .sort()
         .at(-1)!,
+      spamScore: Math.round(
+        links.reduce((sum, l) => sum + (l.spamScore ?? 0), 0) / Math.max(1, links.length),
+      ),
       lostAt: links.every((l) => l.lostAt)
         ? links
             .map((l) => l.lostAt!)
@@ -770,12 +809,25 @@ export class MockProvider
     const brand = target.split('.')[0]!.replace(/-/g, ' ');
     const rows: Backlink[] = [];
 
-    const sourceDomain = (j: number) => {
-      const r = createRng(`blsrc|${target}|${j}`);
-      return `${r.pick(LINK_SOURCE_STEMS)}-${r.pick(LINK_SOURCE_STEMS)}${j}.${r.pick([...TLDS_BG, 'com'])}`;
+    // Referring domains come from a shared market pool (skewed towards popular sites), so
+    // competitors share part of their link profiles (link gap) and a few spam sites appear.
+    const poolIndex = (j: number) => {
+      const u = createRng(`blsrc|${target}|${j}`).next();
+      return Math.floor(LINK_POOL_SIZE * u * u);
     };
+    const usedSources = new Set<number>();
+    const sources: number[] = [];
+    for (let j = 0; sources.length < sampleDomains && j < sampleDomains * 20; j++) {
+      const idx = poolIndex(j);
+      if (usedSources.has(idx)) continue;
+      usedSources.add(idx);
+      sources.push(idx);
+    }
+    const sourceDomain = (j: number) =>
+      linkPoolDomain(sources[j % Math.max(1, sources.length)] ?? j);
     const sourceRating = (j: number) =>
-      Math.round(clamp(createRng(`blsr|${target}|${j}`).float(0, 1) ** 2 * 90 + 2, 0, 100));
+      linkPoolRating(sources[j % Math.max(1, sources.length)] ?? j);
+    const sourceSpam = (j: number) => linkPoolSpam(sources[j % Math.max(1, sources.length)] ?? j);
 
     for (let i = 0; i < sampleRows; i++) {
       const r = createRng(`bl|${target}|${i}`);
@@ -816,6 +868,7 @@ export class MockProvider
         lastSeen: daysAgo(now, lastDays),
         lostAt: lost ? daysAgo(now, lastDays) : null,
         targetStatus: targetPath && r.bool(0.04) ? 404 : 200,
+        spamScore: sourceSpam(j),
       });
     }
     rows.sort((a, b) => b.sourceRating - a.sourceRating || a.sourceUrl.localeCompare(b.sourceUrl));

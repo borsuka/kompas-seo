@@ -34,14 +34,19 @@ describe('createProviders', () => {
     expect(p.keywords.name).toBe('mock');
   });
 
-  it('fails fast with a clear error for providers that are not implemented yet', () => {
+  it('fails fast when DataForSEO is selected without credentials', () => {
     expect(() =>
       createProviders({
-        env: { ...env, BACKLINK_PROVIDER: 'dataforseo' },
+        env: {
+          ...env,
+          BACKLINK_PROVIDER: 'dataforseo',
+          DATAFORSEO_LOGIN: undefined,
+          DATAFORSEO_PASSWORD: undefined,
+        },
         cache: new MemoryCacheStore(),
         usage: new MemoryUsageSink(),
       }),
-    ).toThrow(/BACKLINK_PROVIDER=mock/);
+    ).toThrow(/DATAFORSEO_LOGIN/);
   });
 });
 

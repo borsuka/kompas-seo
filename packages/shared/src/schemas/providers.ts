@@ -162,6 +162,8 @@ export const backlinkSummarySchema = z.object({
   dofollow: z.number().int().min(0),
   nofollow: z.number().int().min(0),
   brokenBacklinks: z.number().int().min(0),
+  /** Provider spam score of the target 0–100 (null when unknown). */
+  spamScore: z.number().min(0).max(100).nullable(),
   updatedAt: z.string(),
 });
 export type BacklinkSummary = z.infer<typeof backlinkSummarySchema>;
@@ -187,6 +189,8 @@ export const backlinkSchema = z.object({
   lostAt: z.string().nullable(),
   /** HTTP status of the target page when known (e.g. 404 → broken backlink). */
   targetStatus: z.number().int().nullable(),
+  /** Provider spam score of the link 0–100 (null when unknown). */
+  spamScore: z.number().min(0).max(100).nullable(),
 });
 export type Backlink = z.infer<typeof backlinkSchema>;
 
@@ -206,6 +210,8 @@ export const referringDomainSchema = z.object({
   firstSeen: z.string(),
   lastSeen: z.string(),
   lostAt: z.string().nullable(),
+  /** Average spam score of its backlinks 0–100 (null when unknown). */
+  spamScore: z.number().min(0).max(100).nullable(),
 });
 export type ReferringDomain = z.infer<typeof referringDomainSchema>;
 

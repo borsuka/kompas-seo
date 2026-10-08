@@ -12,6 +12,7 @@ import { withRetry, type RetryOptions } from './middleware/retry.js';
 import type { Middleware } from './middleware/types.js';
 import { withUsageRecording } from './middleware/usage.js';
 import { DataForSeoClient } from './dataforseo/client.js';
+import { DataForSeoBacklinkProvider } from './dataforseo/dataforseo-backlinks.js';
 import { DataForSeoDomainProvider } from './dataforseo/dataforseo-domains.js';
 import { DataForSeoProvider } from './dataforseo/dataforseo-provider.js';
 import { MockProvider } from './mock/mock-provider.js';
@@ -50,14 +51,16 @@ const ENV_KEY: Record<ProviderKind, keyof ProviderEnv> = {
   backlinks: 'BACKLINK_PROVIDER',
 };
 
-/** DataForSEO implementations available so far (backlinks: Phase 4). */
-const DATAFORSEO_KINDS = new Set<ProviderKind>(['keywords', 'serp', 'domains']);
+/** Kinds with a DataForSEO implementation. */
+const DATAFORSEO_KINDS = new Set<ProviderKind>(['keywords', 'serp', 'domains', 'backlinks']);
 
 function rawProvider<K extends ProviderKind>(
   kind: K,
   impl: ProviderImpl,
   mock: MockProvider,
-  dataForSeo: (kind: ProviderKind) => DataForSeoProvider | DataForSeoDomainProvider,
+  dataForSeo: (
+    kind: ProviderKind,
+  ) => DataForSeoProvider | DataForSeoDomainProvider | DataForSeoBacklinkProvider,
 ): ProviderSet[K] {
   switch (impl) {
     case 'mock':
@@ -92,7 +95,9 @@ export function createProviders(opts: CreateProvidersOptions): ProviderSet {
   const dataForSeo = (kind: ProviderKind) =>
     kind === 'domains'
       ? new DataForSeoDomainProvider(dfsClient())
-      : new DataForSeoProvider(dfsClient());
+      : kind === 'backlinks'
+        ? new DataForSeoBacklinkProvider(dfsClient())
+        : new DataForSeoProvider(dfsClient());
   const onStateChange = (state: BreakerState, provider: string) =>
     opts.logger?.warn({ provider, state }, 'provider circuit breaker state changed');
   const onCacheError = (err: unknown) => opts.logger?.warn({ err }, 'provider cache error');
