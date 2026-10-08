@@ -2,14 +2,15 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 1 (keywords)**:
+> Status: **Phase 2 (domains and competitors)**:
 >
-> - Keyword Explorer with server-side filters, sorting and export.
-> - Keyword Overview with KD, parent topic, traffic potential and the SERP top 10.
-> - Keyword lists with notes, tags, SERP clustering and CSV/XLSX export.
-> - DataForSEO provider for keywords and SERP.
+> - Domain Overview: organic traffic and 12-month trend, top 3/10/100 keywords, domain rating, referring domains, countries, top keywords and pages.
+> - Organic keywords of any domain with new/lost changes, position ranges, filters and export; top pages.
+> - Automatic competitor discovery for a project (shared top-20 SERPs), one click to track a competitor.
+> - Keyword gap for up to 5 domains (missing, weak, strong, untapped, unique, shared) with add-to-list and export; content gap.
+> - DataForSEO provider for domain data.
 >
-> Built on Phase 0: accounts, organizations and roles, projects, credits, background jobs and the bilingual UI.
+> Built on Phase 0 (accounts, organizations and roles, projects, credits, background jobs, bilingual UI) and Phase 1 (Keyword Explorer and Overview, keyword lists, SERP clustering).
 
 ## Requirements
 
@@ -58,7 +59,7 @@ pnpm db:migrate   # apply Postgres + ClickHouse migrations
 
 All configuration is environment-based; see [.env.example](.env.example) for every variable and its purpose. Highlights:
 
-- `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` and `BACKLINK_PROVIDER` follow in Phases 2 and 4.
+- `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` (domain overview, organic keywords, competitors) works the same way. `BACKLINK_PROVIDER` follows in Phase 4.
 - `ANTHROPIC_API_KEY`: optional; enables Claude for classifying ambiguous search intent.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: enable "Continue with Google".
 - `CREDIT_COSTS_JSON`: override credit prices per operation.

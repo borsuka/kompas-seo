@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors · 3. Rank tracking · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
 
 ## Architecture
 
@@ -65,6 +65,14 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 - Intent: provider intent, then BG/EN rules (`seo-core/intent.ts`), then Claude for ambiguous keywords (batches of up to 100, cached 30 days in Redis). Without `ANTHROPIC_API_KEY` only rules are used.
 - Clustering is the `keywords.cluster` job. The API charges `keyword.clusterSerp` per keyword without a stored SERP, the worker fetches the missing SERPs and refunds if the job finally fails.
 - In-memory filters and sorting for lists (`packages/shared/src/keyword-filters.ts`) mirror the ClickHouse explorer filters. Keep them in sync.
+
+## Domains and competitors (Phase 2)
+
+- API module: `apps/api/src/domains` (overview, organic keywords, top pages, competitor discovery, keyword gap, content gap). Algorithms live in `seo-core` (`competitors.ts`, `gap.ts`, `content-gap.ts`).
+- Domain snapshots (up to `DOMAIN_KEYWORD_LIMIT` keywords per domain, live and lost) and overviews are stored in ClickHouse (`domain-store.ts`) and reused for 7 days (`DOMAIN_FRESH_DAYS`), so gap analyses over the same domains are free after the first run.
+- Competitor discovery reads the top 20 for the project's 50 highest-volume keywords (charged as `keyword.clusterSerp` for SERPs not stored yet), counts shared domains, excludes universal sites (Wikipedia, YouTube, social networks) and caches the result in Redis for 7 days. Bump the cache key version when its shape changes.
+- Keyword gap categories are defined in `seo-core/gap.ts`; the tests in `apps/api/test/domains.test.ts` check every tab against its definition.
+- Web: `apps/web/src/app/[locale]/app/competitors/*`; table headers take `metric` for the info tooltip (never put `MetricLabel` inside a sortable header: nested buttons break hydration).
 
 ## Conventions
 
