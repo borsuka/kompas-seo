@@ -88,4 +88,17 @@ describe('tracked job runner', () => {
     expect(updates).toHaveLength(0);
     expect(published).toHaveLength(0);
   });
+
+  it('never lets a late fire-and-forget progress update overwrite the final status', async () => {
+    updates.length = 0;
+    const { deps, published } = fakeDeps();
+    const processor = async (_input: unknown, ctx: { progress: (v: number) => Promise<void> }) => {
+      void ctx.progress(90);
+      void ctx.progress(95);
+      return 'done';
+    };
+    await tracked(deps, processor as never)(job({ jobId: 'job-3', input: {} }));
+    expect(updates.at(-1)?.patch.status).toBe('completed');
+    expect(published.at(-1)?.event.status).toBe('completed');
+  });
 });

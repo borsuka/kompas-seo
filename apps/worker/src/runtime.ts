@@ -58,16 +58,26 @@ export function tracked(deps: WorkerDeps, processor: Processor) {
     };
 
     let lastProgress = 0;
+    // Progress writes are serialized and ignored once the job has finished, so a late
+    // (fire-and-forget) progress update can never overwrite the final status.
+    let finished = false;
+    let chain: Promise<void> = Promise.resolve();
     const ctx: JobContext = {
       logger,
       deps,
       attempt: job.attemptsMade + 1,
       isFinalAttempt: job.attemptsMade + 1 >= maxAttempts,
       orgId: job.data.orgId ?? null,
-      progress: async (value, message) => {
-        lastProgress = Math.max(0, Math.min(100, value));
-        await set('running', { progress: lastProgress, message: message ?? null });
-        await publish({ status: 'running', progress: lastProgress, message });
+      progress: (value, message) => {
+        chain = chain
+          .then(async () => {
+            if (finished) return;
+            lastProgress = Math.max(0, Math.min(100, value));
+            await set('running', { progress: lastProgress, message: message ?? null });
+            await publish({ status: 'running', progress: lastProgress, message });
+          })
+          .catch((err: unknown) => logger.warn({ err }, 'progress update failed'));
+        return chain;
       },
     };
 
@@ -75,11 +85,15 @@ export function tracked(deps: WorkerDeps, processor: Processor) {
     await publish({ status: 'running', progress: lastProgress });
     try {
       const result = await processor(job.data.input ?? job.data, ctx);
+      finished = true;
+      await chain;
       await set('completed', { progress: 100, result: result ?? null, message: null });
       await publish({ status: 'completed', progress: 100, result });
       logger.info('job completed');
       return result;
     } catch (err) {
+      finished = true;
+      await chain;
       const message = err instanceof Error ? err.message : String(err);
       const final = job.attemptsMade + 1 >= maxAttempts;
       if (final) {
