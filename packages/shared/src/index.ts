@@ -12,3 +12,4 @@ export * from './schemas/keywords.js';
 export * from './keyword-filters.js';
 export * from './schemas/domains.js';
 export * from './schemas/rankings.js';
+export * from './schemas/backlinks.js';

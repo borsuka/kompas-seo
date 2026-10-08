@@ -40,6 +40,8 @@ const CLICKHOUSE_TABLES = [
   'provider_usage',
   'domain_overviews',
   'rank_competitor_history',
+  'referring_domains',
+  'backlink_summaries',
 ];
 
 export async function resetDb(db: Database, ch?: ClickHouseClient) {

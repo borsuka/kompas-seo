@@ -134,7 +134,7 @@ export const GAP_TABS = ['missing', 'weak', 'strong', 'untapped', 'unique', 'sha
 export const gapTabSchema = z.enum(GAP_TABS);
 export type GapTab = z.infer<typeof gapTabSchema>;
 
-const competitorsCsv = z.preprocess(
+export const competitorsCsv = z.preprocess(
   (v) =>
     (Array.isArray(v) ? v : typeof v === 'string' ? v.split(',') : [])
       .map((s) => String(s).trim())
