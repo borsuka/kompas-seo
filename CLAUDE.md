@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks (done) · 5. GSC and content · 6. Monetization and polish.
 
 ## Architecture
 
@@ -82,6 +82,13 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 - Metrics (visibility, share of voice, distribution, SERP volatility, alert rules) are pure functions in `seo-core/rankings.ts`. Alerts compare with the previous check, are recorded once per alert, keyword and day, and are emailed as one digest per rule (`apps/worker/src/emails/rank-alert.ts`).
 - Plan limit: `maxTrackedKeywords` counts rows (keyword × device) across the organization.
 - Worker integration tests use their own databases `seo_worker_test` (Postgres + ClickHouse), created on first run.
+
+## Backlinks (Phase 4)
+
+- API module: `apps/api/src/backlinks` (overview, backlinks, referring domains, anchors, link gap, toxicity, disavow). Algorithms in `seo-core/backlinks.ts` (anchor classification, link gap, toxicity, disavow file, new/lost per month).
+- One snapshot per target = summary + top 1000 backlinks (live and lost) + top 1000 referring domains, stored in ClickHouse (`backlink-store.ts`) with a shared `updated_at` and reused for 7 days (`BACKLINK_FRESH_DAYS`). Lists, anchors, link gap and toxicity are computed from the snapshot, so they cost nothing after the first fetch.
+- DataForSEO Backlinks API (`dataforseo-backlinks.ts`): `summary/live`, `backlinks/live`, `referring_domains/live` with `rank_scale: one_hundred`. Dates arrive as `2019-11-15 12:57:46 +00:00` (`parseDfsDate`).
+- Toxicity is conservative on purpose (disavowing good links hurts): the provider spam score is a floor, our signals add on top. Disavow entries live in Postgres (`disavow_entries`) and export as a Google disavow file.
 
 ## Conventions
 

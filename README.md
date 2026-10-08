@@ -2,7 +2,14 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 3 (rank tracking)**:
+> Status: **Phase 4 (backlinks)**:
+>
+> - Backlink profile: rating, referring domains, new/lost per month, anchors by type, rel and TLD split.
+> - Backlinks and referring domains with live/new/lost/broken filters and export.
+> - Link gap: outreach prospects that link to competitors but not to you.
+> - Toxic link scoring and a disavow list exported in Google's format.
+>
+> Phase 3 (rank tracking):
 >
 > - Daily rank tracking per device for the project and its competitors, history and 1/7/30-day changes.
 > - Visibility, average position, distribution, share of voice, SERP volatility and top movers.
@@ -65,7 +72,7 @@ pnpm db:migrate   # apply Postgres + ClickHouse migrations
 
 All configuration is environment-based; see [.env.example](.env.example) for every variable and its purpose. Highlights:
 
-- `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` (domain overview, organic keywords, competitors) works the same way. `BACKLINK_PROVIDER` follows in Phase 4.
+- `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` (domain overview, organic keywords, competitors) works the same way. `BACKLINK_PROVIDER` uses the DataForSEO Backlinks API (check that it is enabled for your DataForSEO account).
 - `ANTHROPIC_API_KEY`: optional; enables Claude for classifying ambiguous search intent.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: enable "Continue with Google".
 - `CREDIT_COSTS_JSON`: override credit prices per operation.
