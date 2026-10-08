@@ -4,7 +4,8 @@ import type TestAgent from 'supertest/lib/agent.js';
 import { truncateAll } from '@seo/db/testing';
 import { eq, schema, type Database } from '@seo/db';
 import type { ClickHouseClient } from '@seo/db/clickhouse';
-import { CLICKHOUSE, DB } from '../src/infra/tokens.js';
+import type { Redis } from 'ioredis';
+import { CLICKHOUSE, DB, REDIS } from '../src/infra/tokens.js';
 
 export const ORIGIN = process.env.APP_URL ?? 'http://localhost:3000';
 
@@ -21,6 +22,10 @@ export async function startApp(): Promise<TestApp> {
   await app.init();
   const db = app.get<Database>(DB);
   const ch = app.get<ClickHouseClient>(CLICKHOUSE);
+  // Provider responses are cached in Redis; start every suite from a clean test DB (15).
+  const redis = app.get<Redis>(REDIS);
+  if (redis.options.db !== 15) throw new Error('Refusing to flush a non-test Redis database');
+  await redis.flushdb();
   return { app, db, ch, close: () => app.close() };
 }
 
@@ -33,6 +38,7 @@ const CLICKHOUSE_TABLES = [
   'backlinks',
   'domain_metrics',
   'provider_usage',
+  'domain_overviews',
 ];
 
 export async function resetDb(db: Database, ch?: ClickHouseClient) {

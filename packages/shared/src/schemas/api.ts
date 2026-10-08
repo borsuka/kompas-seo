@@ -60,7 +60,11 @@ export type Project = z.infer<typeof projectSchema>;
 
 export const competitorSourceSchema = z.enum(['manual', 'auto']);
 
-export const addCompetitorSchema = z.object({ domain: domainSchema });
+export const addCompetitorSchema = z.object({
+  domain: domainSchema,
+  /** `auto` when accepted from competitor discovery. */
+  source: z.enum(['manual', 'auto']).default('manual'),
+});
 export type AddCompetitorInput = z.input<typeof addCompetitorSchema>;
 
 export const competitorSchema = z.object({

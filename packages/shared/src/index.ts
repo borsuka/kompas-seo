@@ -10,3 +10,4 @@ export * from './schemas/providers.js';
 export * from './schemas/api.js';
 export * from './schemas/keywords.js';
 export * from './keyword-filters.js';
+export * from './schemas/domains.js';

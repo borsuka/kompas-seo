@@ -99,7 +99,12 @@ export class ProjectsService {
     return this.repo.listCompetitors(organizationId, projectId);
   }
 
-  async addCompetitor(actor: Actor, projectId: string, domain: string): Promise<Competitor> {
+  async addCompetitor(
+    actor: Actor,
+    projectId: string,
+    domain: string,
+    source: 'manual' | 'auto' = 'manual',
+  ): Promise<Competitor> {
     const project = await this.get(actor.organizationId, projectId);
     if (domain === project.domain) {
       throw new AppError('VALIDATION_FAILED', 'A project cannot compete with itself');
@@ -122,7 +127,7 @@ export class ProjectsService {
       actor.organizationId,
       projectId,
       domain,
-      'manual',
+      source,
     );
     if (!competitor) throw new AppError('CONFLICT', 'Competitor already added');
     await this.audit.log({

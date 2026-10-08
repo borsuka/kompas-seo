@@ -6,7 +6,7 @@ export interface FilterableKeyword {
   volume: number;
   kd: number | null;
   cpc: number | null;
-  competition: number | null;
+  competition?: number | null;
   wordCount: number;
   intent: readonly string[];
   serpFeatures: readonly string[];
@@ -40,8 +40,8 @@ export function compareKeywords(field: SortableField, dir: 'asc' | 'desc') {
   const sign = dir === 'asc' ? 1 : -1;
   return (a: FilterableKeyword, b: FilterableKeyword): number => {
     if (field === 'keyword') return sign * a.keyword.localeCompare(b.keyword, 'bg');
-    const x = a[field];
-    const y = b[field];
+    const x = a[field] ?? null;
+    const y = b[field] ?? null;
     if (x === null && y === null) return a.keyword.localeCompare(b.keyword, 'bg');
     if (x === null) return 1;
     if (y === null) return -1;

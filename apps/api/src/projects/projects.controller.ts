@@ -86,7 +86,12 @@ export class ProjectsController {
     @Param('id', { schema: id }) projectId: string,
     @Body({ schema: addCompetitorSchema }) body: z.output<typeof addCompetitorSchema>,
   ) {
-    return this.projects.addCompetitor(this.actor(org, user, req), projectId, body.domain);
+    return this.projects.addCompetitor(
+      this.actor(org, user, req),
+      projectId,
+      body.domain,
+      body.source,
+    );
   }
 
   @Delete(':id/competitors/:competitorId')
