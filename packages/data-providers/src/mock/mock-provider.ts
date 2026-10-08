@@ -30,6 +30,7 @@ import type {
   KeywordDataProvider,
   SerpProvider,
 } from '../types.js';
+import { getProviderContext } from '../context.js';
 import { createRng, hashString, slugify, toVolumeBucket, type Rng } from './rng.js';
 import {
   DOMAIN_SUFFIXES,
@@ -289,6 +290,23 @@ export class MockProvider
         domain: 'youtube.com',
         url: `https://www.youtube.com/watch?v=${hashString(k).toString(36)}`,
       });
+    }
+    // Rankings drift a little every day (stable within a day).
+    const day = this.now().toISOString().slice(0, 10);
+    const daily = createRng(`serp-day|${day}|${loc.locationCode}|${device}|${k}`);
+    for (let i = 0; i < organic.length - 1; i++) {
+      if (daily.bool(0.08)) [organic[i], organic[i + 1]] = [organic[i + 1]!, organic[i]!];
+    }
+    // Hinted domains (project + competitors during rank checks) rank for most keywords.
+    for (const raw of getProviderContext()?.hints?.domains ?? []) {
+      const d = normalizeDomain(raw) ?? raw;
+      if (organic.some((o) => o.domain === d)) continue;
+      const r = createRng(`hint|${loc.locationCode}|${device}|${k}|${d}`);
+      if (!r.bool(0.8)) continue;
+      const base = clamp(Math.round(Math.exp(r.float(0, Math.log(60)))), 1, 60);
+      const drift = Math.round(createRng(`hint-day|${day}|${device}|${k}|${d}`).normal() * 1.5);
+      const at = clamp(base + drift, 1, organic.length + 1) - 1;
+      organic.splice(at, 0, { domain: d, url: `https://${d}/${slugify(topic)}` });
     }
     organic.length = Math.min(organic.length, depth);
 

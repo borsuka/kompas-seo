@@ -33,6 +33,20 @@ describe('withCache', () => {
     expect(impl).toHaveBeenCalledTimes(2);
   });
 
+  it('bypasses cached responses in refresh mode but stores the fresh one', async () => {
+    const store = new MemoryCacheStore();
+    let n = 0;
+    const impl = vi.fn(async () => ({ n: ++n }));
+    const serp = decorateProvider('serp', fakeSerp(impl), [withCache(store)]);
+    await serp.getSerp('a', loc, 'desktop', 100);
+    const fresh = await withProviderContext({ orgId: 'o', cache: 'refresh' }, () =>
+      serp.getSerp('a', loc, 'desktop', 100),
+    );
+    expect(fresh).toEqual({ n: 2 });
+    expect(await serp.getSerp('a', loc, 'desktop', 100)).toEqual({ n: 2 });
+    expect(impl).toHaveBeenCalledTimes(2);
+  });
+
   it('expires entries after the TTL', async () => {
     let t = 0;
     const store = new MemoryCacheStore(() => t);

@@ -10,6 +10,7 @@ import {
   serpSnapshotSchema,
   type Locale,
 } from '@seo/shared';
+import { withProviderContext } from '../context.js';
 import { MockProvider } from './mock-provider.js';
 import { createRng, hashString, slugify, toVolumeBucket } from './rng.js';
 
@@ -162,5 +163,49 @@ describe('MockProvider', () => {
     const domains = await p.getReferringDomains('example.bg', { limit: 10, offset: 0 });
     for (const d of domains) referringDomainSchema.parse(d);
     expect(domains[0]!.rating >= domains.at(-1)!.rating).toBe(true);
+  });
+});
+
+describe('MockProvider rank tracking support', () => {
+  const keywords = [
+    'зъболекар софия',
+    'избелване на зъби',
+    'детски зъболекар',
+    'зъбни импланти',
+    'брекети цена',
+  ];
+  const position = (
+    items: { type: string; domain: string | null; rankGroup: number }[],
+    d: string,
+  ) => items.find((i) => i.type === 'organic' && i.domain === d)?.rankGroup ?? null;
+
+  it('ranks hinted domains for most keywords and moves them a little day to day', async () => {
+    const day1 = new MockProvider({ now: () => new Date('2026-10-07T05:00:00Z') });
+    const day2 = new MockProvider({ now: () => new Date('2026-10-08T05:00:00Z') });
+    const hints = { orgId: 'o', hints: { domains: ['moyat-zabolekar.bg'] } };
+    const p1: (number | null)[] = [];
+    const p2: (number | null)[] = [];
+    for (const k of keywords) {
+      p1.push(
+        position(
+          (await withProviderContext(hints, () => day1.getSerp(k, BG, 'desktop', 100))).items,
+          'moyat-zabolekar.bg',
+        ),
+      );
+      p2.push(
+        position(
+          (await withProviderContext(hints, () => day2.getSerp(k, BG, 'desktop', 100))).items,
+          'moyat-zabolekar.bg',
+        ),
+      );
+    }
+    expect(p1.filter((p) => p !== null).length).toBeGreaterThanOrEqual(3);
+    for (const [i, p] of p1.entries()) {
+      if (p !== null && p2[i] !== null) expect(Math.abs(p - p2[i]!)).toBeLessThanOrEqual(10);
+    }
+    // Without hints the domain does not appear (and same-day SERPs are identical).
+    const plain = await day1.getSerp(keywords[0]!, BG, 'desktop', 100);
+    expect(position(plain.items, 'moyat-zabolekar.bg')).toBeNull();
+    expect(await day1.getSerp(keywords[0]!, BG, 'desktop', 100)).toEqual(plain);
   });
 });

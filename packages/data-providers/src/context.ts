@@ -5,6 +5,14 @@ export interface ProviderRequestContext {
   orgId: string | null;
   userId?: string | null;
   requestId?: string;
+  /** `refresh`: skip cached responses (still stores the fresh one), e.g. daily rank checks. */
+  cache?: 'default' | 'refresh';
+  /**
+   * Domains the caller is interested in (e.g. a project and its competitors during a rank
+   * check). Real providers ignore it; the mock provider makes these domains rank so local
+   * development without API keys shows realistic rank tracking.
+   */
+  hints?: { domains?: readonly string[] };
 }
 
 const requestStorage = new AsyncLocalStorage<ProviderRequestContext>();
