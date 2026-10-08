@@ -14,6 +14,7 @@
   "dependencies": {
     "@seo/data-providers": "workspace:*",
     "@seo/db": "workspace:*",
+    "@seo/seo-core": "workspace:*",
     "@seo/shared": "workspace:*",
     "bullmq": "^6.3.11",
     "ioredis": "^6.0.0",

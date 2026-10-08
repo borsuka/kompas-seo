@@ -38,7 +38,7 @@ const providers = createProviders({
 const deps: WorkerDeps = { db, redis, clickhouse, providers, logger };
 
 /** Concurrency per queue: CPU-light I/O bound jobs can run in parallel. */
-const CONCURRENCY: Record<QueueName, number> = { system: 5, credits: 1 };
+const CONCURRENCY: Record<QueueName, number> = { system: 5, credits: 1, keywords: 3 };
 
 const workers = (Object.values(QUEUES) as QueueName[]).map((queueName) => {
   const worker = new Worker(

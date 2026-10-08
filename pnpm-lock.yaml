@@ -390,6 +390,9 @@ importers:
       '@seo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@seo/seo-core':
+        specifier: workspace:*
+        version: link:../../packages/seo-core
       '@seo/shared':
         specifier: workspace:*
         version: link:../../packages/shared

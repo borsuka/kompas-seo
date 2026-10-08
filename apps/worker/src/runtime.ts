@@ -26,6 +26,10 @@ export interface JobContext {
   deps: WorkerDeps;
   /** BullMQ attempt number (1-based). */
   attempt: number;
+  /** True when a failure now will not be retried (time to compensate, e.g. refund). */
+  isFinalAttempt: boolean;
+  /** Organization the job runs for (null for system jobs). */
+  orgId: string | null;
 }
 
 export type Processor<TInput = unknown, TResult = unknown> = (
@@ -58,6 +62,8 @@ export function tracked(deps: WorkerDeps, processor: Processor) {
       logger,
       deps,
       attempt: job.attemptsMade + 1,
+      isFinalAttempt: job.attemptsMade + 1 >= maxAttempts,
+      orgId: job.data.orgId ?? null,
       progress: async (value, message) => {
         lastProgress = Math.max(0, Math.min(100, value));
         await set('running', { progress: lastProgress, message: message ?? null });
