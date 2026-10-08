@@ -2,11 +2,19 @@ import { Queue, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import { pino } from 'pino';
 import { ClickHouseUsageSink, createProviders, RedisCacheStore } from '@seo/data-providers';
-import { createDb } from '@seo/db';
+import { createDb, insertJob } from '@seo/db';
 import { clickHouseConfigFromEnv, createClickHouse } from '@seo/db/clickhouse';
-import { JOB_QUEUE, QUEUES, type JobType, type QueueName } from '@seo/shared';
+import {
+  JOB_QUEUE,
+  QUEUES,
+  resolveCreditCosts,
+  type JobType,
+  type QueueName,
+  type TrackedJobData,
+} from '@seo/shared';
 import { loadRootEnv, parseEnv, workerEnvSchema } from '@seo/shared/server';
 import { startHealthServer } from './health.js';
+import { createMailer } from './mailer.js';
 import { PROCESSORS } from './processors/index.js';
 import { tracked, type WorkerDeps } from './runtime.js';
 
@@ -35,10 +43,42 @@ const providers = createProviders({
   usage,
   logger: { warn: (obj, msg) => logger.warn(obj, msg) },
 });
-const deps: WorkerDeps = { db, redis, clickhouse, providers, logger };
+const queues = Object.fromEntries(
+  (Object.values(QUEUES) as QueueName[]).map((q) => [q, new Queue(q, { connection: redis })]),
+) as Record<QueueName, Queue>;
+
+const deps: WorkerDeps = {
+  db,
+  redis,
+  clickhouse,
+  providers,
+  logger,
+  mailer: createMailer(env),
+  appUrl: env.APP_URL,
+  creditCosts: resolveCreditCosts(env.CREDIT_COSTS_JSON),
+  async enqueue(type, input, opts) {
+    const queue = queues[JOB_QUEUE[type]];
+    if (opts.dedupeKey) {
+      const existing = await queue.getJob(opts.dedupeKey);
+      if (existing && !(await existing.isCompleted()) && !(await existing.isFailed())) return null;
+      // A finished job with the same key blocks re-adding under that id: remove it first.
+      if (existing) await existing.remove();
+    }
+    const row = await insertJob(db, { organizationId: opts.organizationId, type, input });
+    const data: TrackedJobData = { jobId: row.id, orgId: opts.organizationId, input };
+    await queue.add(type, data, {
+      jobId: opts.dedupeKey ?? row.id,
+      removeOnComplete: { age: 3600, count: 1000 },
+      removeOnFail: { age: 24 * 3600 },
+      attempts: 3,
+      backoff: { type: 'exponential', delay: 5000 },
+    });
+    return row.id;
+  },
+};
 
 /** Concurrency per queue: CPU-light I/O bound jobs can run in parallel. */
-const CONCURRENCY: Record<QueueName, number> = { system: 5, credits: 1, keywords: 3 };
+const CONCURRENCY: Record<QueueName, number> = { system: 5, credits: 1, keywords: 3, rankings: 2 };
 
 const workers = (Object.values(QUEUES) as QueueName[]).map((queueName) => {
   const worker = new Worker(
@@ -57,7 +97,7 @@ const workers = (Object.values(QUEUES) as QueueName[]).map((queueName) => {
 });
 
 // Scheduled jobs (idempotent upserts: safe on every start, across replicas).
-const creditsQueue = new Queue(QUEUES.credits, { connection: redis });
+const creditsQueue = queues[QUEUES.credits];
 await creditsQueue.upsertJobScheduler(
   'credits.monthly-grant',
   { pattern: '0 5 1 * *', tz: 'UTC' },
@@ -66,6 +106,12 @@ await creditsQueue.upsertJobScheduler(
     data: {},
     opts: { attempts: 3, backoff: { type: 'exponential', delay: 60_000 } },
   },
+);
+// Rank tracking: every hour, projects whose keywords are due get a daily check.
+await queues[QUEUES.rankings].upsertJobScheduler(
+  'rankings.schedule',
+  { pattern: '10 * * * *', tz: 'UTC' },
+  { name: 'rankings.schedule', data: {}, opts: { attempts: 2 } },
 );
 
 let running = true;
@@ -77,7 +123,7 @@ async function shutdown(signal: string) {
   running = false;
   logger.info({ signal }, 'shutting down');
   await Promise.allSettled(workers.map((w) => w.close()));
-  await creditsQueue.close();
+  await Promise.allSettled(Object.values(queues).map((q) => q.close()));
   await usage.flush();
   health.close();
   await Promise.allSettled([closeDb(), clickhouse.close()]);

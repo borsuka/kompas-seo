@@ -6,10 +6,14 @@ import type { ClickHouseClient } from '@seo/db/clickhouse';
 import type { ProviderSet } from '@seo/data-providers';
 import {
   jobProgressChannel,
+  type CreditCost,
   type JobEvent,
   type JobStatus,
+  type JobType,
+  type ProviderOperation,
   type TrackedJobData,
 } from '@seo/shared';
+import type { Mailer } from './mailer.js';
 
 export interface WorkerDeps {
   db: Database;
@@ -17,6 +21,19 @@ export interface WorkerDeps {
   clickhouse: ClickHouseClient;
   providers: ProviderSet;
   logger: Logger;
+  mailer: Mailer;
+  /** Public web URL for links in emails. */
+  appUrl: string;
+  creditCosts: Record<ProviderOperation, CreditCost>;
+  /**
+   * Creates a tracked job (jobs row + BullMQ job) from inside the worker. With `dedupeKey`,
+   * a job with the same key that is still queued or running is reused (returns null).
+   */
+  enqueue: <T>(
+    type: JobType,
+    input: T,
+    opts: { organizationId: string | null; dedupeKey?: string },
+  ) => Promise<string | null>;
 }
 
 export interface JobContext {
