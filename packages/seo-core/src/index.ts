@@ -9,3 +9,4 @@ export * from './cluster.js';
 export * from './competitors.js';
 export * from './gap.js';
 export * from './content-gap.js';
+export * from './rankings.js';
