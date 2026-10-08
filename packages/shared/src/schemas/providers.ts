@@ -208,3 +208,42 @@ export const referringDomainSchema = z.object({
   lostAt: z.string().nullable(),
 });
 export type ReferringDomain = z.infer<typeof referringDomainSchema>;
+
+export const domainKeywordQuerySchema = pagingSchema.extend({
+  /** `live`: current rankings. `lost`: keywords the domain ranked for and dropped out of the top 100. */
+  mode: z.enum(['live', 'lost']).default('live'),
+});
+export type DomainKeywordQuery = z.input<typeof domainKeywordQuerySchema>;
+
+export const domainOverviewSchema = z.object({
+  domain: z.string(),
+  locationCode: z.number().int(),
+  languageCode: z.string(),
+  organicKeywords: z.number().int().min(0),
+  top3: z.number().int().min(0),
+  top10: z.number().int().min(0),
+  top100: z.number().int().min(0),
+  /** Provider's estimated monthly organic traffic (our own estimate is computed separately). */
+  estTraffic: z.number().min(0),
+  newKeywords: z.number().int().min(0),
+  lostKeywords: z.number().int().min(0),
+  /** Monthly history, oldest first. */
+  history: z.array(
+    z.object({
+      year: z.number().int(),
+      month: z.number().int().min(1).max(12),
+      keywords: z.number().int().min(0),
+      estTraffic: z.number().min(0),
+    }),
+  ),
+  /** Organic presence per country (Google Ads location codes). */
+  countries: z.array(
+    z.object({
+      locationCode: z.number().int(),
+      keywords: z.number().int().min(0),
+      estTraffic: z.number().min(0),
+    }),
+  ),
+  updatedAt: z.string(),
+});
+export type DomainOverview = z.infer<typeof domainOverviewSchema>;

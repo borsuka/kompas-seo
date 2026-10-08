@@ -8,6 +8,8 @@ import {
   type CompetitorCandidate,
   type Device,
   type DomainKeyword,
+  type DomainKeywordQuery,
+  type DomainOverview,
   type IdeaOptions,
   type IdeaSource,
   type Intent,
@@ -435,9 +437,104 @@ export class MockProvider
 
   // ----------------------------------------------------------------- domains
 
-  async getDomainKeywords(domain: string, loc: Locale, opts: Paging): Promise<DomainKeyword[]> {
-    const all = this.allDomainKeywords(normalizeDomain(domain) ?? domain, loc);
-    return all.slice(opts.offset, opts.offset + opts.limit);
+  async getDomainKeywords(
+    domain: string,
+    loc: Locale,
+    opts: DomainKeywordQuery,
+  ): Promise<DomainKeyword[]> {
+    const d = normalizeDomain(domain) ?? domain;
+    const all =
+      opts.mode === 'lost' ? this.lostDomainKeywords(d, loc) : this.allDomainKeywords(d, loc);
+    const offset = opts.offset ?? 0;
+    return all.slice(offset, offset + (opts.limit ?? 100));
+  }
+
+  /** Keywords the domain recently dropped out of the top 100 (≈ 8 % of its keywords). */
+  private lostDomainKeywords(domain: string, loc: Locale): DomainKeyword[] {
+    const current = new Set(this.allDomainKeywords(domain, loc).map((k) => k.keyword));
+    const vocab = vocabFor(loc);
+    const total = Math.max(3, Math.round(this.domainKeywordCount(domain, loc) * 0.08));
+    const out: DomainKeyword[] = [];
+    const seen = new Set<string>();
+    for (let i = 0; out.length < total && i < total * 20; i++) {
+      const r = createRng(`lost|${loc.locationCode}|${domain}|${i}`);
+      const keyword = normalizeKeyword(`${r.pick(vocab.topics)} ${r.pick(vocab.suffixes)}`);
+      if (current.has(keyword) || seen.has(keyword)) continue;
+      seen.add(keyword);
+      const m = this.metricsFor(keyword, loc);
+      const last = r.int(5, 100);
+      out.push({
+        domain,
+        keyword,
+        locationCode: loc.locationCode,
+        languageCode: loc.languageCode,
+        // Last known position before the keyword was lost.
+        position: last,
+        previousPosition: last,
+        url: `https://${domain}/${slugify(keyword.split(' ')[0] ?? keyword)}`,
+        volume: m.volume,
+        cpc: m.cpc,
+        kd: m.kd,
+        intent: m.intent,
+        serpFeatures: m.serpFeatures,
+        estTraffic: 0,
+      });
+    }
+    return out.sort((a, b) => b.volume - a.volume || a.keyword.localeCompare(b.keyword));
+  }
+
+  async getDomainOverview(domain: string, loc: Locale): Promise<DomainOverview> {
+    const d = normalizeDomain(domain) ?? domain;
+    const rows = this.allDomainKeywords(d, loc);
+    const total = this.domainKeywordCount(d, loc);
+    const scale = total / Math.max(1, rows.length);
+    const top = (n: number) => Math.round(rows.filter((r) => r.position <= n).length * scale);
+    const estTraffic = Math.round(rows.reduce((s, r) => s + (r.estTraffic ?? 0), 0));
+    const rng = createRng(`overview|${loc.locationCode}|${d}`);
+    const growth = rng.float(-0.03, 0.06);
+    const now = this.now();
+    const history = Array.from({ length: 12 }, (_, idx) => {
+      const back = 11 - idx;
+      const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - back, 1));
+      const noise = createRng(
+        `overview-h|${loc.locationCode}|${d}|${date.getUTCFullYear()}-${date.getUTCMonth()}`,
+      ).normal();
+      const factor = Math.max(0.1, 1 - growth * back + 0.05 * noise);
+      return {
+        year: date.getUTCFullYear(),
+        month: date.getUTCMonth() + 1,
+        keywords: Math.round(total * factor),
+        estTraffic: Math.round(estTraffic * factor),
+      };
+    });
+    // The home market dominates; a few other markets get a smaller share.
+    const others = [2826, 2276, 2840, 2642].filter((c) => c !== loc.locationCode);
+    const countries = [
+      { locationCode: loc.locationCode, keywords: total, estTraffic },
+      ...others.slice(0, rng.int(1, others.length)).map((code) => {
+        const share = rng.float(0.02, 0.15);
+        return {
+          locationCode: code,
+          keywords: Math.round(total * share),
+          estTraffic: Math.round(estTraffic * share),
+        };
+      }),
+    ];
+    return {
+      domain: d,
+      locationCode: loc.locationCode,
+      languageCode: loc.languageCode,
+      organicKeywords: total,
+      top3: top(3),
+      top10: top(10),
+      top100: total,
+      estTraffic,
+      newKeywords: Math.round(rows.filter((r) => r.previousPosition === null).length * scale),
+      lostKeywords: this.lostDomainKeywords(d, loc).length,
+      history,
+      countries,
+      updatedAt: now.toISOString(),
+    };
   }
 
   domainKeywordCount(domain: string, loc: Locale): number {

@@ -12,6 +12,7 @@ import { withRetry, type RetryOptions } from './middleware/retry.js';
 import type { Middleware } from './middleware/types.js';
 import { withUsageRecording } from './middleware/usage.js';
 import { DataForSeoClient } from './dataforseo/client.js';
+import { DataForSeoDomainProvider } from './dataforseo/dataforseo-domains.js';
 import { DataForSeoProvider } from './dataforseo/dataforseo-provider.js';
 import { MockProvider } from './mock/mock-provider.js';
 import type { ProviderKind, ProviderSet } from './types.js';
@@ -49,14 +50,14 @@ const ENV_KEY: Record<ProviderKind, keyof ProviderEnv> = {
   backlinks: 'BACKLINK_PROVIDER',
 };
 
-/** DataForSEO implementations available so far (domains: Phase 2, backlinks: Phase 4). */
-const DATAFORSEO_KINDS = new Set<ProviderKind>(['keywords', 'serp']);
+/** DataForSEO implementations available so far (backlinks: Phase 4). */
+const DATAFORSEO_KINDS = new Set<ProviderKind>(['keywords', 'serp', 'domains']);
 
 function rawProvider<K extends ProviderKind>(
   kind: K,
   impl: ProviderImpl,
   mock: MockProvider,
-  dataForSeo: () => DataForSeoProvider,
+  dataForSeo: (kind: ProviderKind) => DataForSeoProvider | DataForSeoDomainProvider,
 ): ProviderSet[K] {
   switch (impl) {
     case 'mock':
@@ -68,7 +69,7 @@ function rawProvider<K extends ProviderKind>(
           `DataForSEO provider for "${kind}" is not implemented yet. Set ${ENV_KEY[kind]}=mock.`,
         );
       }
-      return dataForSeo() as unknown as ProviderSet[K];
+      return dataForSeo(kind) as unknown as ProviderSet[K];
   }
 }
 
@@ -81,15 +82,17 @@ function rawProvider<K extends ProviderKind>(
 export function createProviders(opts: CreateProvidersOptions): ProviderSet {
   const creditCosts = resolveCreditCosts(opts.env.CREDIT_COSTS_JSON);
   const mock = new MockProvider();
-  let dfs: DataForSeoProvider | null = null;
-  const dataForSeo = () =>
-    (dfs ??= new DataForSeoProvider(
-      new DataForSeoClient({
-        login: opts.env.DATAFORSEO_LOGIN ?? '',
-        password: opts.env.DATAFORSEO_PASSWORD ?? '',
-        sandbox: opts.env.DATAFORSEO_SANDBOX ?? false,
-      }),
-    ));
+  let client: DataForSeoClient | null = null;
+  const dfsClient = () =>
+    (client ??= new DataForSeoClient({
+      login: opts.env.DATAFORSEO_LOGIN ?? '',
+      password: opts.env.DATAFORSEO_PASSWORD ?? '',
+      sandbox: opts.env.DATAFORSEO_SANDBOX ?? false,
+    }));
+  const dataForSeo = (kind: ProviderKind) =>
+    kind === 'domains'
+      ? new DataForSeoDomainProvider(dfsClient())
+      : new DataForSeoProvider(dfsClient());
   const onStateChange = (state: BreakerState, provider: string) =>
     opts.logger?.warn({ provider, state }, 'provider circuit breaker state changed');
   const onCacheError = (err: unknown) => opts.logger?.warn({ err }, 'provider cache error');

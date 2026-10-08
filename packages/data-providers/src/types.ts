@@ -5,6 +5,8 @@ import type {
   CompetitorCandidate,
   Device,
   DomainKeyword,
+  DomainKeywordQuery,
+  DomainOverview,
   IdeaOptions,
   KeywordIdea,
   KeywordMetrics,
@@ -33,8 +35,14 @@ export interface SerpProvider {
 
 export interface DomainDataProvider {
   readonly name: string;
-  getDomainKeywords(domain: string, loc: Locale, opts: Paging): Promise<DomainKeyword[]>;
+  getDomainKeywords(
+    domain: string,
+    loc: Locale,
+    opts: DomainKeywordQuery,
+  ): Promise<DomainKeyword[]>;
   getCompetitors(domain: string, loc: Locale): Promise<CompetitorCandidate[]>;
+  /** Totals, position buckets, monthly history and country split (extension of the spec interface). */
+  getDomainOverview(domain: string, loc: Locale): Promise<DomainOverview>;
 }
 
 export interface BacklinkProvider {
@@ -87,9 +95,10 @@ export const METHOD_SPECS = {
     getDomainKeywords: {
       operation: 'domain.keywords',
       ttlSec: CACHE_TTL.domain,
-      units: (a) => (a[2] as Paging).limit,
+      units: (a) => (a[2] as Paging).limit ?? 100,
     },
     getCompetitors: { operation: 'domain.competitors', ttlSec: CACHE_TTL.domain, units: () => 1 },
+    getDomainOverview: { operation: 'domain.overview', ttlSec: CACHE_TTL.domain, units: () => 1 },
   },
   backlinks: {
     getBacklinkSummary: {
