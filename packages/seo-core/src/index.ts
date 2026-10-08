@@ -6,3 +6,6 @@ export * from './traffic.js';
 export * from './kd.js';
 export * from './intent.js';
 export * from './cluster.js';
+export * from './competitors.js';
+export * from './gap.js';
+export * from './content-gap.js';
