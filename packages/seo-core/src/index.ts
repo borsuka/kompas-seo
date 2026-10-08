@@ -10,3 +10,4 @@ export * from './competitors.js';
 export * from './gap.js';
 export * from './content-gap.js';
 export * from './rankings.js';
+export * from './backlinks.js';
