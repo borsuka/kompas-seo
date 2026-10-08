@@ -81,8 +81,12 @@ export function useCompetitors(projectId: string | undefined) {
 export function useAddCompetitor(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (domain: string) =>
-      api<Competitor>(`/projects/${projectId}/competitors`, { method: 'POST', body: { domain } }),
+    mutationFn: (input: string | { domain: string; source: 'manual' | 'auto' }) =>
+      api<Competitor>(`/projects/${projectId}/competitors`, {
+        method: 'POST',
+        body: typeof input === 'string' ? { domain: input } : input,
+      }),
+    // Also refreshes the discovery list (its "tracked" flags) under the same key prefix.
     onSuccess: () => qc.invalidateQueries({ queryKey: qk.competitors(projectId) }),
   });
 }

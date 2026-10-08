@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { DomainOverviewView } from './overview';
 
-export default function Page() {
+export default function CompetitorsPage() {
   return (
     <Suspense>
-      <SectionPlaceholder section="competitors" />
+      <DomainOverviewView />
     </Suspense>
   );
 }

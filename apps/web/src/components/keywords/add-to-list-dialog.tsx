@@ -23,17 +23,23 @@ export function AddToListDialog({
   locationCode,
   languageCode,
   onDone,
+  label,
+  defaultName = '',
 }: {
   keywords: string[];
   locationCode: number;
   languageCode: string;
   onDone?: () => void;
+  /** Trigger text; defaults to "Add to list". */
+  label?: string;
+  /** Prefilled name for a new list. */
+  defaultName?: string;
 }) {
   const t = useTranslations();
   const errorMessage = useErrorMessage();
   const [open, setOpen] = useState(false);
   const [listId, setListId] = useState('');
-  const [newName, setNewName] = useState('');
+  const [newName, setNewName] = useState(defaultName);
   const lists = useKeywordLists();
   const create = useCreateList();
   const add = useAddItems();
@@ -56,7 +62,7 @@ export function AddToListDialog({
       const res = await add.mutateAsync({ listId: target, keywords });
       toast.success(t('keywords.lists.added', { added: res.added, skipped: res.skipped }));
       setOpen(false);
-      setNewName('');
+      setNewName(defaultName);
       onDone?.();
     } catch (err) {
       toast.error(errorMessage(err));
@@ -68,7 +74,7 @@ export function AddToListDialog({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm" disabled={!keywords.length}>
-          <ListPlus aria-hidden /> {t('keywords.addToList')}
+          <ListPlus aria-hidden /> {label ?? t('keywords.addToList')}
         </Button>
       </DialogTrigger>
       <DialogContent closeLabel={t('common.close')}>

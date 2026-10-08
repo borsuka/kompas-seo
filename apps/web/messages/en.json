@@ -334,7 +334,10 @@
     "credits": "Credits are spent on data source requests.",
     "competition": "Google Ads competition (0–1): how many advertisers bid on the keyword.",
     "trafficPotential": "Traffic the #1 page gets from all keywords it ranks for.",
-    "parentTopic": "The most searched keyword the #1 page also ranks for. Target it to cover the whole topic."
+    "parentTopic": "The most searched keyword the #1 page also ranks for. Target it to cover the whole topic.",
+    "organicKeywords": "Number of keywords the domain ranks for in the top 100 in the selected country.",
+    "domainRating": "Backlink profile strength (0–100) from the data provider. Higher rating = easier to rank.",
+    "competitionLevel": "Share of common keywords among all keywords of both domains. Higher = more direct competitor."
   },
   "notFound": {
     "title": "Page not found",
@@ -511,6 +514,159 @@
       "orCreate": "or create a new one",
       "saved": "Saved",
       "edit": "Edit"
+    }
+  },
+  "competitors": {
+    "title": "Competitors",
+    "domainPlaceholder": "Enter a domain, e.g. example.com",
+    "domainLabel": "Domain to analyze",
+    "invalidDomain": "Invalid domain",
+    "analyze": "Analyze",
+    "emptyTitle": "Analyze any domain",
+    "emptyBody": "See its organic traffic, keywords and pages, where visitors come from and how it compares with competitors.",
+    "new": "New",
+    "lost": "Lost",
+    "movedUp": "up",
+    "movedDown": "down",
+    "dataFrom": "Data from {date}",
+    "creditsSpent": "Credits spent: {count}",
+    "tabs": {
+      "label": "Competitor sections",
+      "overview": "Domain overview",
+      "keywords": "Organic keywords",
+      "pages": "Top pages",
+      "discover": "Competitor discovery",
+      "gap": "Keyword gap",
+      "contentGap": "Content gap"
+    },
+    "columns": {
+      "keyword": "Keyword",
+      "intent": "Intent",
+      "position": "Position",
+      "change": "Change",
+      "volume": "Volume",
+      "kd": "KD",
+      "cpc": "CPC",
+      "traffic": "Traffic",
+      "url": "Page",
+      "keywords": "Keywords",
+      "topKeyword": "Top keyword",
+      "domain": "Domain",
+      "competitionLevel": "Competition level",
+      "commonKeywords": "Common keywords",
+      "domainKeywords": "Domain keywords",
+      "actions": "Actions"
+    },
+    "overview": {
+      "description": "Organic visibility of the domain",
+      "traffic": "Organic traffic",
+      "keywords": "Organic keywords",
+      "buckets": "Top 3: {top3} · Top 10: {top10}",
+      "rating": "Domain rating",
+      "referringDomains": "Referring domains",
+      "backlinks": "{count, plural, one {# backlink} other {# backlinks}}",
+      "history": "Traffic over the last 12 months",
+      "changes": "New keywords: {new} · Lost: {lost}",
+      "countries": "Traffic by country",
+      "keywordsCount": "{count, plural, one {# keyword} other {# keywords}}",
+      "topKeywords": "Top keywords",
+      "topPages": "Top pages",
+      "viewAll": "View all"
+    },
+    "keywordsPage": {
+      "description": "Keywords the domain ranks for in the top 100",
+      "changes": "Changes",
+      "changeOptions": {
+        "all": "All",
+        "new": "New",
+        "lost": "Lost"
+      },
+      "ranges": {
+        "all": "All positions",
+        "top3": "Top 3",
+        "top10": "Top 10",
+        "p11_20": "11–20",
+        "p21_100": "21–100"
+      },
+      "forUrl": "Only for page:",
+      "results": "{count, plural, one {# keyword} other {# keywords}}"
+    },
+    "pagesPage": {
+      "description": "Pages that bring the most organic traffic",
+      "topKeywordMeta": "#{position} · {volume}",
+      "results": "{count, plural, one {# page} other {# pages}}",
+      "empty": "No ranking pages"
+    },
+    "discover": {
+      "title": "Competitor discovery",
+      "description": "Domains that rank for the same keywords as {domain}",
+      "noProject": "Create a project to discover its competitors",
+      "createProject": "New project",
+      "startTitle": "Who are your real competitors in Google?",
+      "startBody": "We check the top 20 results for the project’s most important keywords and rank domains by shared keywords. The result is kept for 7 days.",
+      "start": "Discover competitors",
+      "viewerHint": "You need the Member role or higher to run an analysis.",
+      "none": "No competitors found",
+      "analyzed": "{count, plural, one {# keyword analyzed} other {# keywords analyzed}}",
+      "tracked": "Tracked",
+      "track": "Track",
+      "trackDomain": "Track {domain}",
+      "openGap": "Keyword gap with tracked",
+      "trackedTitle": "Tracked competitors",
+      "trackedBody": "Used by default in keyword gap and rank tracking.",
+      "noTracked": "You are not tracking any competitors yet",
+      "source": {
+        "manual": "manual",
+        "auto": "discovered"
+      },
+      "manage": "Manage in settings"
+    },
+    "gapForm": {
+      "target": "Your domain",
+      "targetPlaceholder": "example.com",
+      "competitors": "Competitors (up to 4)",
+      "competitorPlaceholder": "Competitor {n}",
+      "compare": "Compare",
+      "invalidTarget": "Enter a valid domain",
+      "needCompetitor": "Add at least one competitor different from your domain"
+    },
+    "gap": {
+      "title": "Keyword gap",
+      "description": "Compare your keywords with up to 4 competitors",
+      "emptyTitle": "Enter your domain and competitors",
+      "emptyBody": "See the keywords competitors rank for and you do not, and where you fall behind.",
+      "tabs": {
+        "missing": "Missing",
+        "weak": "Weak",
+        "strong": "Strong",
+        "untapped": "Untapped",
+        "unique": "Unique",
+        "shared": "Shared"
+      },
+      "tabHints": {
+        "missing": "Every competitor ranks for these keywords, you do not.",
+        "weak": "You rank lower than every competitor that also ranks.",
+        "strong": "You rank higher than every competitor that also ranks.",
+        "untapped": "At least one competitor ranks, you do not.",
+        "unique": "Only you rank for these keywords.",
+        "shared": "Every domain ranks for these keywords."
+      },
+      "results": "{count, plural, one {# keyword} other {# keywords}}",
+      "noResults": "No keywords in this category",
+      "addPage": "Add {count} to a list",
+      "listName": "Gap: {tab} · {domain}"
+    },
+    "contentGap": {
+      "title": "Content gap",
+      "description": "Topics where competitors have pages with traffic and you do not",
+      "emptyBody": "We find the topics competitors get traffic for where you have no content yet.",
+      "topic": "Topic",
+      "competitors": "Competitors",
+      "pages": "Competitor pages",
+      "results": "{count, plural, one {# topic} other {# topics}}",
+      "none": "No missed topics: you cover everything competitors cover",
+      "addTopics": "Add {count} topics to a list",
+      "listName": "Content gap · {domain}"
     }
   }
 }
