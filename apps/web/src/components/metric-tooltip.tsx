@@ -19,7 +19,9 @@ export type MetricKey =
   | 'visibility'
   | 'avgPosition'
   | 'shareOfVoice'
-  | 'volatility';
+  | 'volatility'
+  | 'spamScore'
+  | 'toxicity';
 
 /** Info icon whose tooltip explains the metric (texts in messages → metrics). */
 export function MetricInfo({ metric }: { metric: MetricKey }) {

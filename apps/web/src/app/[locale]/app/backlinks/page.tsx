@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { BacklinksOverview } from './overview';
 
-export default function Page() {
+export default function BacklinksPage() {
   return (
     <Suspense>
-      <SectionPlaceholder section="backlinks" />
+      <BacklinksOverview />
     </Suspense>
   );
 }

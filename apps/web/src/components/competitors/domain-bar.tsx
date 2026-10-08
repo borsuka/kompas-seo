@@ -19,7 +19,8 @@ export function useDomainParams() {
   return { domain, loc, lang, params, set };
 }
 
-export function DomainBar() {
+/** `showLocale`: backlink data does not depend on the market, so it can be hidden. */
+export function DomainBar({ showLocale = true }: { showLocale?: boolean } = {}) {
   const t = useTranslations('competitors');
   const { domain, loc, lang, set } = useDomainParams();
   const [input, setInput] = useState(domain);
@@ -29,7 +30,7 @@ export function DomainBar() {
     e.preventDefault();
     const d = normalizeDomain(input);
     setInvalid(!d);
-    if (d) set({ domain: d, loc, lang });
+    if (d) set(showLocale ? { domain: d, loc, lang } : { domain: d });
   }
 
   return (
@@ -53,7 +54,9 @@ export function DomainBar() {
           </p>
         )}
       </div>
-      <LocalePicker loc={loc} lang={lang} onChange={(l, lg) => set({ loc: l, lang: lg })} />
+      {showLocale && (
+        <LocalePicker loc={loc} lang={lang} onChange={(l, lg) => set({ loc: l, lang: lg })} />
+      )}
       <Button type="submit" className="h-10" disabled={!input.trim()}>
         {t('analyze')}
       </Button>

@@ -341,7 +341,9 @@
     "visibility": "How many of the possible clicks you get: 100 % means #1 for every tracked keyword (weighted by volume).",
     "avgPosition": "Average position of the keywords that rank in the top 100.",
     "shareOfVoice": "Each domain's share of the expected clicks on the tracked keywords (volume × CTR by position).",
-    "volatility": "How much the top 10 moved since the previous check: 0 = no change, 10 = completely new results."
+    "volatility": "How much the top 10 moved since the previous check: 0 = no change, 10 = completely new results.",
+    "spamScore": "Spam score from the data provider (0–100): how spam-like the source looks.",
+    "toxicity": "Our risk score (0–100) from the spam score and signals such as suspicious domains, link farms and no authority."
   },
   "notFound": {
     "title": "Page not found",
@@ -851,6 +853,165 @@
         "change": "Change",
         "notified": "Email"
       }
+    }
+  },
+  "backlinks": {
+    "title": "Backlinks",
+    "emptyTitle": "Analyze any domain's link profile",
+    "emptyBody": "Referring domains, backlinks, anchors, new and lost links, link gap and toxic links.",
+    "noResults": "No results with these filters",
+    "creditsSpent": "Credits spent: {count}",
+    "lostOn": "lost {date}",
+    "sample": "Analyzed {backlinks} backlinks and {domains} referring domains (strongest first) · data from {date}",
+    "tabs": {
+      "label": "Backlink sections",
+      "overview": "Overview",
+      "links": "Backlinks",
+      "domains": "Referring domains",
+      "anchors": "Anchors",
+      "linkGap": "Link gap",
+      "toxic": "Toxic & disavow"
+    },
+    "columns": {
+      "anchor": "Anchor",
+      "type": "Type",
+      "referringDomains": "Ref. domains",
+      "domain": "Domain",
+      "rating": "Rating",
+      "backlinks": "Backlinks",
+      "source": "Source",
+      "target": "Target page",
+      "spam": "Spam",
+      "firstSeen": "First seen",
+      "lastSeen": "Last seen",
+      "rel": "Rel",
+      "dofollow": "Dofollow",
+      "toxicity": "Toxicity",
+      "competitors": "Competitors"
+    },
+    "anchors": {
+      "empty": "(no anchor)",
+      "description": "The texts other sites use to link to the domain",
+      "all": "All",
+      "hint": "A natural profile is mostly branded and URL anchors. Many exact-match keyword anchors can look manipulative.",
+      "results": "{count, plural, one {# anchor} other {# anchors}}"
+    },
+    "anchorTypes": {
+      "branded": "Branded",
+      "url": "URL",
+      "generic": "Generic (\"here\")",
+      "empty": "Empty",
+      "other": "Keyword / other"
+    },
+    "rel": {
+      "follow": "Dofollow",
+      "nofollow": "Nofollow",
+      "ugc": "UGC",
+      "sponsored": "Sponsored"
+    },
+    "overview": {
+      "description": "Link profile of the domain",
+      "rating": "Domain rating",
+      "referringDomains": "Referring domains",
+      "referringIps": "from {count} IP addresses",
+      "backlinks": "Backlinks",
+      "dofollowShare": "{share} dofollow",
+      "broken": "Broken backlinks",
+      "brokenHint": "links to pages returning 4xx/5xx",
+      "newLost": "New and lost referring domains",
+      "newLostHint": "Per month, last 12 months",
+      "new": "New",
+      "lost": "Lost",
+      "anchorTypes": "Anchor types",
+      "topAnchors": "Top anchors",
+      "topDomains": "Top referring domains",
+      "viewAll": "View all",
+      "rel": "Link attributes",
+      "tlds": "Top-level domains"
+    },
+    "links": {
+      "description": "Every link found to the domain",
+      "status": "Status",
+      "statuses": {
+        "live": "Live",
+        "new": "New (30 days)",
+        "lost": "Lost",
+        "broken": "Broken",
+        "all": "All"
+      },
+      "search": "Search anchor or URL",
+      "allRel": "All attributes",
+      "results": "{count, plural, one {# backlink} other {# backlinks}}"
+    },
+    "domains": {
+      "description": "Sites linking to the domain",
+      "search": "Search domain",
+      "results": "{count, plural, one {# domain} other {# domains}}"
+    },
+    "linkGap": {
+      "title": "Link gap",
+      "description": "Sites that link to your competitors but not to you",
+      "emptyTitle": "Enter your domain and competitors",
+      "emptyBody": "You get a ready list of outreach prospects: domains that already link to your competitors.",
+      "min": "Linking to at least",
+      "minOption": "{count, plural, one {# competitor} other {# competitors}}",
+      "hideToxic": "Hide toxic domains",
+      "results": "{count, plural, one {# domain} other {# domains}}",
+      "none": "No domains match these conditions"
+    },
+    "toxicity": {
+      "levels": {
+        "low": "Low toxicity",
+        "medium": "Medium toxicity",
+        "high": "High toxicity"
+      },
+      "reasons": {
+        "provider_spam_score": "High spam score from the data provider",
+        "spammy_tld": "Suspicious top-level domain",
+        "spammy_words": "Spam words in the domain (casino, pills, links…)",
+        "no_authority": "Almost no authority",
+        "link_farm": "Many links from a weak domain (link farm / sitewide)",
+        "ip_address": "IP address instead of a domain",
+        "all_nofollow": "Only nofollow links"
+      }
+    },
+    "toxic": {
+      "title": "Toxic links & disavow",
+      "description": "Risk score for every referring domain of {domain}",
+      "noProject": "Create a project to check its links",
+      "createProject": "New project",
+      "added": "Added to disavow: {added}, skipped (already listed): {skipped}",
+      "reason": "Toxicity {score}",
+      "invalid": "Invalid lines: {values}",
+      "status": "Status",
+      "disavowed": "Disavowed",
+      "active": "Active",
+      "disavowedCount": "In the disavow list",
+      "level": "Level",
+      "levels": {
+        "medium": "Medium and high",
+        "high": "High only",
+        "all": "All"
+      },
+      "disavowedFilter": {
+        "all": "All",
+        "no": "Not disavowed",
+        "yes": "Disavowed"
+      },
+      "results": "{count, plural, one {# domain} other {# domains}}",
+      "selectRow": "Select {domain}",
+      "none": "No toxic domains",
+      "noneBody": "The link profile looks clean with these filters.",
+      "disavowSelected": "Disavow {count, plural, one {# domain} other {# domains}}",
+      "caution": "Only disavow clear spam: removing good links can hurt your rankings.",
+      "listTitle": "Disavow list",
+      "listHint": "Download the file and upload it in Google Search Console → Disavow links.",
+      "download": "Download disavow.txt",
+      "remove": "Remove {value}",
+      "empty": "The list is empty.",
+      "manual": "Add manually (one domain or URL per line)",
+      "manualPlaceholder": "spam-site.xyz\nhttps://example.com/spam-page",
+      "addManual": "Add"
     }
   }
 }

@@ -31,7 +31,7 @@ export function useGapParams() {
   return { target, competitors, loc, lang, confirmed, params, set };
 }
 
-export function GapForm() {
+export function GapForm({ showLocale = true }: { showLocale?: boolean } = {}) {
   const t = useTranslations('competitors.gapForm');
   const { target, competitors, loc, lang, set } = useGapParams();
   const [you, setYou] = useState(target);
@@ -54,7 +54,11 @@ export function GapForm() {
     if (!tgt) return setError(t('invalidTarget'));
     if (!comps.length) return setError(t('needCompetitor'));
     setError(null);
-    set({ target: tgt, competitors: comps.join(','), loc, lang });
+    set(
+      showLocale
+        ? { target: tgt, competitors: comps.join(','), loc, lang }
+        : { target: tgt, competitors: comps.join(',') },
+    );
   }
 
   return (
@@ -89,7 +93,11 @@ export function GapForm() {
         </fieldset>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <LocalePicker loc={loc} lang={lang} onChange={(l, lg) => set({ loc: l, lang: lg })} />
+        {showLocale ? (
+          <LocalePicker loc={loc} lang={lang} onChange={(l, lg) => set({ loc: l, lang: lg })} />
+        ) : (
+          <span />
+        )}
         <div className="flex items-center gap-3">
           {error && (
             <p className="text-destructive text-sm" role="alert">
