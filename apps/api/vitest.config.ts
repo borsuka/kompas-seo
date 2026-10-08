@@ -10,6 +10,7 @@ export default defineConfig({
     // Integration tests share one test database: run files sequentially.
     fileParallelism: false,
     testTimeout: 30_000,
-    hookTimeout: 60_000,
+    // Generous: app bootstrap can be slow while other workspaces build in parallel.
+    hookTimeout: 120_000,
   },
 });

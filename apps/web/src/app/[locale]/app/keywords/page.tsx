@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { KeywordExplorer } from './explorer';
 
-export default function Page() {
+export default function KeywordsPage() {
   return (
     <Suspense>
-      <SectionPlaceholder section="keywords" />
+      <KeywordExplorer />
     </Suspense>
   );
 }

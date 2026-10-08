@@ -3,7 +3,16 @@ import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@seo/ui/tooltip';
 
-export type MetricKey = 'volume' | 'kd' | 'cpc' | 'intent' | 'traffic' | 'credits';
+export type MetricKey =
+  | 'volume'
+  | 'kd'
+  | 'cpc'
+  | 'intent'
+  | 'traffic'
+  | 'credits'
+  | 'competition'
+  | 'trafficPotential'
+  | 'parentTopic';
 
 /** Label + info icon whose tooltip explains the metric (texts in messages → metrics). */
 export function MetricLabel({ metric, label }: { metric: MetricKey; label: string }) {

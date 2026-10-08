@@ -20,11 +20,11 @@ loadRootEnv();
 const config = clickHouseConfigFromEnv(
   parseEnv(clickhouseEnvSchema, {
     ...process.env,
-    CLICKHOUSE_DATABASE: process.env.CLICKHOUSE_TEST_DATABASE ?? 'seo_test',
+    // Own database: API integration tests truncate seo_test and may run in parallel.
+    CLICKHOUSE_DATABASE: 'seo_store_test',
   }),
 );
-// Unique locale per run keeps runs independent without truncating shared tables.
-const loc = { locationCode: 2100, languageCode: `t${Date.now() % 1e9}` } as const;
+const loc = { locationCode: 2100, languageCode: 'bg' } as const;
 let ch: ClickHouseClient;
 
 const metric = (
@@ -54,6 +54,9 @@ const metric = (
 beforeAll(async () => {
   await migrateClickHouse(config, clickhouseMigrationsFolder, () => undefined);
   ch = createClickHouse(config);
+  for (const table of ['keywords', 'keyword_idea_sets', 'serp_snapshots']) {
+    await ch.command({ query: 'TRUNCATE TABLE IF EXISTS ' + table });
+  }
 });
 afterAll(async () => {
   await ch?.close();

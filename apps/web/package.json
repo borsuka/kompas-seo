@@ -16,6 +16,7 @@
     "@seo/shared": "workspace:*",
     "@seo/ui": "workspace:*",
     "@tanstack/react-query": "^5.104.1",
+    "@tanstack/react-virtual": "^3.14.13",
     "better-auth": "^1.7.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -26,6 +27,7 @@
     "radix-ui": "^1.7.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "recharts": "^3.10.1",
     "sonner": "^2.0.8",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.5"
