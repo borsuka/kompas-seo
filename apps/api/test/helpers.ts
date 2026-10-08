@@ -3,13 +3,15 @@ import request from 'supertest';
 import type TestAgent from 'supertest/lib/agent.js';
 import { truncateAll } from '@seo/db/testing';
 import { eq, schema, type Database } from '@seo/db';
-import { DB } from '../src/infra/tokens.js';
+import type { ClickHouseClient } from '@seo/db/clickhouse';
+import { CLICKHOUSE, DB } from '../src/infra/tokens.js';
 
 export const ORIGIN = process.env.APP_URL ?? 'http://localhost:3000';
 
 export interface TestApp {
   app: INestApplication;
   db: Database;
+  ch: ClickHouseClient;
   close: () => Promise<void>;
 }
 
@@ -18,11 +20,32 @@ export async function startApp(): Promise<TestApp> {
   const app = await createApp();
   await app.init();
   const db = app.get<Database>(DB);
-  return { app, db, close: () => app.close() };
+  const ch = app.get<ClickHouseClient>(CLICKHOUSE);
+  return { app, db, ch, close: () => app.close() };
 }
 
-export async function resetDb(db: Database) {
+const CLICKHOUSE_TABLES = [
+  'keywords',
+  'keyword_idea_sets',
+  'serp_snapshots',
+  'rank_history',
+  'domain_keywords',
+  'backlinks',
+  'domain_metrics',
+  'provider_usage',
+];
+
+export async function resetDb(db: Database, ch?: ClickHouseClient) {
   await truncateAll(db);
+  if (ch) {
+    const [row] = await ch
+      .query({ query: 'SELECT currentDatabase() AS db', format: 'JSONEachRow' })
+      .then((r) => r.json<{ db: string }>());
+    if (!row?.db.endsWith('_test'))
+      throw new Error('Refusing to truncate a non-test ClickHouse database');
+    for (const table of CLICKHOUSE_TABLES)
+      await ch.command({ query: 'TRUNCATE TABLE IF EXISTS ' + table });
+  }
 }
 
 /** A cookie-keeping client that sends our Origin (required by CSRF checks). */
