@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
 
 ## Architecture
 
@@ -73,6 +73,15 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 - Competitor discovery reads the top 20 for the project's 50 highest-volume keywords (charged as `keyword.clusterSerp` for SERPs not stored yet), counts shared domains, excludes universal sites (Wikipedia, YouTube, social networks) and caches the result in Redis for 7 days. Bump the cache key version when its shape changes.
 - Keyword gap categories are defined in `seo-core/gap.ts`; the tests in `apps/api/test/domains.test.ts` check every tab against its definition.
 - Web: `apps/web/src/app/[locale]/app/competitors/*`; table headers take `metric` for the info tooltip (never put `MetricLabel` inside a sortable header: nested buttons break hydration).
+
+## Rank tracking (Phase 3)
+
+- Tracked keywords, alert rules and alert events live in Postgres (`packages/db/src/schema/rankings.ts`); history in ClickHouse `rank_history` (project) and `rank_competitor_history` via `rank-store.ts`. Positions are read with `argMax(tuple(position), checked_at).1` because aggregates skip NULL (= not in the top 100).
+- The worker's hourly `rankings.schedule` enqueues one `rankings.check` per project and day (dedupe key `rank-check:<project>:<date>`). Scheduled checks are charged in the worker (`rank.check` per keyword, idempotent per day; insufficient credits fail without retry); manual checks and the first check after adding keywords are charged by the API. Failed keywords are refunded.
+- Rank checks fetch a fresh SERP (provider context `cache: 'refresh'`) to depth 100 and pass `hints.domains` (project + competitors): real providers ignore it, the mock ranks those domains so local development shows realistic data.
+- Metrics (visibility, share of voice, distribution, SERP volatility, alert rules) are pure functions in `seo-core/rankings.ts`. Alerts compare with the previous check, are recorded once per alert, keyword and day, and are emailed as one digest per rule (`apps/worker/src/emails/rank-alert.ts`).
+- Plan limit: `maxTrackedKeywords` counts rows (keyword × device) across the organization.
+- Worker integration tests use their own databases `seo_worker_test` (Postgres + ClickHouse), created on first run.
 
 ## Conventions
 

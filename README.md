@@ -2,7 +2,13 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 2 (domains and competitors)**:
+> Status: **Phase 3 (rank tracking)**:
+>
+> - Daily rank tracking per device for the project and its competitors, history and 1/7/30-day changes.
+> - Visibility, average position, distribution, share of voice, SERP volatility and top movers.
+> - Email alerts on drops, gains and entering/leaving the top N.
+>
+> Phase 2 (domains and competitors):
 >
 > - Domain Overview: organic traffic and 12-month trend, top 3/10/100 keywords, domain rating, referring domains, countries, top keywords and pages.
 > - Organic keywords of any domain with new/lost changes, position ranges, filters and export; top pages.
@@ -41,7 +47,7 @@ pnpm dev
 pnpm db:seed
 ```
 
-Creates `demo@kompas.local` / `demo-password-123` with an organization and a sample project.
+Creates `demo@kompas.local` / `demo-password-123` with an organization, a sample project and 30 days of synthetic rank tracking history.
 
 ## Everyday commands
 
