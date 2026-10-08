@@ -562,20 +562,33 @@ export class MockProvider
     const modifiers = ['', ...vocab.suffixes];
     const prefixes = ['', ...vocab.prefixes];
 
+    // Head terms of the market: every domain ranks for a random ~65 % of them, so peers share
+    // a realistic common core (needed for "missing"/"shared" keyword gap results).
+    const candidates = vocab.topics
+      .slice(0, 10)
+      .flatMap((t) =>
+        modifiers.slice(0, 10).map((m) => ({ topic: t, keyword: normalizeKeyword(`${t} ${m}`) })),
+      );
+    const ranks = (k: string) => createRng(`core|${memoKey}|${k}`).bool(0.65);
+    const core = candidates.filter((c) => ranks(c.keyword));
+    const coreCount = Math.min(core.length, Math.ceil(total * 0.6));
+
     const rows: DomainKeyword[] = [];
-    const seen = new Set<string>();
-    for (let i = 0; rows.length < total && i < total * 3; i++) {
-      const topicIdx = i < focus * 40 ? i % focus : i % topics.length;
-      const topic = i === 0 ? brand : topics[topicIdx]!;
-      const mod = modifiers[Math.floor(i / topics.length) % modifiers.length]!;
-      const pre = prefixes[Math.floor(i / (topics.length * modifiers.length)) % prefixes.length]!;
-      const keyword = normalizeKeyword(`${pre} ${topic} ${mod}`);
+    // Head terms this domain does not rank for stay excluded from the long tail as well.
+    const seen = new Set<string>(candidates.filter((c) => !ranks(c.keyword)).map((c) => c.keyword));
+    for (let i = 0; rows.length < total && i < total * 3 + coreCount; i++) {
+      const j = i - coreCount;
+      const topicIdx = j < focus * 40 ? j % focus : j % topics.length;
+      const topic = i < coreCount ? core[i]!.topic : j === 0 ? brand : topics[topicIdx]!;
+      const mod = modifiers[Math.floor(j / topics.length) % modifiers.length]!;
+      const pre = prefixes[Math.floor(j / (topics.length * modifiers.length)) % prefixes.length]!;
+      const keyword = i < coreCount ? core[i]!.keyword : normalizeKeyword(`${pre} ${topic} ${mod}`);
       if (!keyword || seen.has(keyword)) continue;
       seen.add(keyword);
 
       const r = createRng(`dkrow|${memoKey}|${keyword}`);
       const m = this.metricsFor(keyword, loc);
-      const position = i === 0 ? 1 : clamp(Math.round(Math.exp(r.float(0, Math.log(100)))), 1, 100);
+      const position = j === 0 ? 1 : clamp(Math.round(Math.exp(r.float(0, Math.log(100)))), 1, 100);
       rows.push({
         domain,
         keyword,
@@ -583,7 +596,7 @@ export class MockProvider
         languageCode: loc.languageCode,
         position,
         previousPosition: r.bool(0.1) ? null : clamp(position + r.int(-6, 6), 1, 100),
-        url: i === 0 ? `https://${domain}/` : `https://${domain}/${slugify(topic)}`,
+        url: j === 0 ? `https://${domain}/` : `https://${domain}/${slugify(topic)}`,
         volume: m.volume,
         cpc: m.cpc,
         kd: m.kd,
