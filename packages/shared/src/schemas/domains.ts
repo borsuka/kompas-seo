@@ -120,7 +120,8 @@ export const competitorDiscoverySchema = z.object({
     z.object({
       domain: z.string(),
       commonKeywords: z.number().int(),
-      domainKeywords: z.number().int(),
+      /** Total keywords of the competitor (from the provider); null when unknown. */
+      domainKeywords: z.number().int().nullable(),
       competitionLevel: z.number(),
       tracked: z.boolean(),
     }),

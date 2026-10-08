@@ -29,16 +29,35 @@ export interface ContentGapTopic {
   competitors: number;
 }
 
+/**
+ * Whether a keyword is a navigational query for the domain's brand, e.g. "web studio"
+ * or "webstudio цени" for web-studio.bg. Brand topics are not content opportunities.
+ */
+export function isBrandKeyword(keyword: string, domain: string): boolean {
+  const label = domain.replace(/^www\./, '').split('.')[0] ?? '';
+  if (label.length < 3) return false;
+  const spaced = label.replace(/[-_]+/g, ' ');
+  const compact = keyword.replace(/[\s_-]+/g, '');
+  return keyword.includes(spaced) || compact.includes(label.replace(/[-_]+/g, ''));
+}
+
 export function contentGap(
   targetKeywords: ReadonlySet<string>,
   pages: readonly CompetitorPage[],
-  opts: { minCompetitors?: number; minPageKeywords?: number } = {},
+  opts: { minCompetitors?: number; minPageKeywords?: number; excludeBrands?: boolean } = {},
 ): ContentGapTopic[] {
   const minPageKeywords = opts.minPageKeywords ?? 1;
   const groups = new Map<string, { pages: CompetitorPage[]; keywords: Map<string, number> }>();
 
-  for (const page of pages) {
-    if (page.keywords.length < minPageKeywords) continue;
+  for (const original of pages) {
+    const page =
+      opts.excludeBrands === false
+        ? original
+        : {
+            ...original,
+            keywords: original.keywords.filter((k) => !isBrandKeyword(k.keyword, original.domain)),
+          };
+    if (!page.keywords.length || page.keywords.length < minPageKeywords) continue;
     if (page.keywords.some((k) => targetKeywords.has(k.keyword))) continue;
     const topic = [...page.keywords].sort(
       (a, b) => b.volume - a.volume || a.keyword.localeCompare(b.keyword),

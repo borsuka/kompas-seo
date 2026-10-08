@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { discoverCompetitors } from './competitors.js';
-import { contentGap } from './content-gap.js';
+import { contentGap, isBrandKeyword } from './content-gap.js';
 import { countGapCategories, keywordGap, type DomainRanking } from './gap.js';
 
 const r = (keyword: string, position: number): DomainRanking => ({ keyword, position });
@@ -130,5 +130,34 @@ describe('contentGap', () => {
     expect(contentGap(new Set(), pages, { minCompetitors: 2 }).map((t) => t.topic)).toEqual([
       'зимни гуми',
     ]);
+  });
+});
+
+describe('isBrandKeyword', () => {
+  it('detects navigational brand queries of a domain', () => {
+    expect(isBrandKeyword('web studio', 'web-studio.bg')).toBe(true);
+    expect(isBrandKeyword('webstudio цени', 'web-studio.bg')).toBe(true);
+    expect(isBrandKeyword('уеб дизайн', 'web-studio.bg')).toBe(false);
+    expect(isBrandKeyword('emag отзиви', 'www.emag.bg')).toBe(true);
+  });
+
+  it('keeps competitor brand topics out of the content gap', () => {
+    const pages = [
+      {
+        domain: 'web-studio.bg',
+        url: 'https://web-studio.bg/',
+        keywords: [{ keyword: 'web studio', volume: 900, position: 1 }],
+      },
+      {
+        domain: 'web-studio.bg',
+        url: 'https://web-studio.bg/dizain',
+        keywords: [
+          { keyword: 'web studio дизайн', volume: 500, position: 2 },
+          { keyword: 'уеб дизайн', volume: 300, position: 4 },
+        ],
+      },
+    ];
+    expect(contentGap(new Set(), pages).map((t) => t.topic)).toEqual(['уеб дизайн']);
+    expect(contentGap(new Set(), pages, { excludeBrands: false })).toHaveLength(2);
   });
 });

@@ -259,7 +259,7 @@ export class DomainsService {
       locationCode: project.locationCode,
       languageCode: project.languageCode as Locale['languageCode'],
     };
-    const cacheKey = `discovery:v1:${project.id}:${project.domain}:${loc.locationCode}:${loc.languageCode}`;
+    const cacheKey = `discovery:v2:${project.id}:${project.domain}:${loc.locationCode}:${loc.languageCode}`;
     const tracked = new Set(
       (await this.projects.competitors(ctx.organizationId, projectId)).map((c) => c.domain),
     );
@@ -324,7 +324,7 @@ export class DomainsService {
       competitors: scores.map((s) => ({
         domain: s.domain,
         commonKeywords: s.commonKeywords,
-        domainKeywords: s.domainKeywords,
+        domainKeywords: counts.has(s.domain) ? s.domainKeywords : null,
         competitionLevel: Math.round(s.competitionLevel * 1000) / 1000,
         tracked: tracked.has(s.domain),
       })),
