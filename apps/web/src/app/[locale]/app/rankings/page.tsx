@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { RankingsOverview } from './overview';
 
-export default function Page() {
+export default function RankingsPage() {
   return (
     <Suspense>
-      <SectionPlaceholder section="rankings" />
+      <RankingsOverview />
     </Suspense>
   );
 }

@@ -15,7 +15,11 @@ export type MetricKey =
   | 'parentTopic'
   | 'organicKeywords'
   | 'domainRating'
-  | 'competitionLevel';
+  | 'competitionLevel'
+  | 'visibility'
+  | 'avgPosition'
+  | 'shareOfVoice'
+  | 'volatility';
 
 /** Info icon whose tooltip explains the metric (texts in messages → metrics). */
 export function MetricInfo({ metric }: { metric: MetricKey }) {

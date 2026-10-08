@@ -337,7 +337,11 @@
     "parentTopic": "The most searched keyword the #1 page also ranks for. Target it to cover the whole topic.",
     "organicKeywords": "Number of keywords the domain ranks for in the top 100 in the selected country.",
     "domainRating": "Backlink profile strength (0–100) from the data provider. Higher rating = easier to rank.",
-    "competitionLevel": "Share of common keywords among all keywords of both domains. Higher = more direct competitor."
+    "competitionLevel": "Share of common keywords among all keywords of both domains. Higher = more direct competitor.",
+    "visibility": "How many of the possible clicks you get: 100 % means #1 for every tracked keyword (weighted by volume).",
+    "avgPosition": "Average position of the keywords that rank in the top 100.",
+    "shareOfVoice": "Each domain's share of the expected clicks on the tracked keywords (volume × CTR by position).",
+    "volatility": "How much the top 10 moved since the previous check: 0 = no change, 10 = completely new results."
   },
   "notFound": {
     "title": "Page not found",
@@ -667,6 +671,186 @@
       "none": "No missed topics: you cover everything competitors cover",
       "addTopics": "Add {count} topics to a list",
       "listName": "Content gap · {domain}"
+    }
+  },
+  "rankings": {
+    "title": "Rankings",
+    "notRanked": "Not in top 100",
+    "notRankedShort": ">100",
+    "movedUp": "up",
+    "movedDown": "down",
+    "noProject": "Create a project to track its rankings",
+    "createProject": "New project",
+    "emptyTitle": "Start tracking your rankings",
+    "emptyBody": "Add the keywords that matter to your business. We check them every day on desktop and/or mobile, together with your competitors.",
+    "addKeywords": "Add keywords",
+    "device": "Device",
+    "devices": {
+      "all": "All",
+      "desktop": "Desktop",
+      "mobile": "Mobile"
+    },
+    "checkNow": "Check now",
+    "checkDone": "Rankings updated",
+    "checkFailed": "The check failed",
+    "checking": "Checking… {progress}%",
+    "lastChecked": "Last check: {date}",
+    "neverChecked": "Not checked yet",
+    "checkCost": "{count, plural, one {# credit} other {# credits}} to check every keyword",
+    "tabs": {
+      "label": "Rankings sections",
+      "overview": "Overview",
+      "keywords": "Keywords",
+      "alerts": "Alerts"
+    },
+    "overview": {
+      "description": "Daily Google rank tracking for {domain}",
+      "period": "Period",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "visibility": "Visibility",
+      "visibilityChange": "{change} pp vs. the previous check",
+      "avgPosition": "Average position",
+      "ranked": "Ranking keywords",
+      "rankedOf": "of {count} tracked",
+      "changes": "Changes",
+      "changesHint": "up / down vs. the previous check",
+      "visibilityTrend": "Visibility over time",
+      "needMoreChecks": "The chart appears after at least two checks.",
+      "distribution": "Position distribution",
+      "buckets": {
+        "top3": "Top 3",
+        "p4_10": "4–10",
+        "p11_20": "11–20",
+        "p21_50": "21–50",
+        "p51_100": "51–100",
+        "notRanked": "Not in top 100"
+      },
+      "keywords": "Keywords",
+      "shareOfVoice": "Share of voice",
+      "shareOfVoiceHint": "Share of expected clicks on the tracked keywords vs. competitors",
+      "volatility": "SERP volatility",
+      "volatilityToday": "Today: {value} of 10",
+      "moversUp": "Top gainers",
+      "moversDown": "Top losers",
+      "noMovers": "No changes since the previous check"
+    },
+    "add": {
+      "open": "Add keywords",
+      "close": "Close",
+      "title": "Add keywords",
+      "description": "Free slots on your plan: {left} of {max}.",
+      "keywords": "Keywords (one per line)",
+      "keywordsPlaceholder": "dentist sofia\nteeth whitening",
+      "devices": "Devices",
+      "device": {
+        "desktop": "Desktop",
+        "mobile": "Mobile"
+      },
+      "tags": "Tags",
+      "tagsPlaceholder": "e.g. services, brand (comma separated)",
+      "cost": "The first check starts right away: about {rows, plural, one {# credit} other {# credits}} plus the volume of new keywords.",
+      "overLimit": "You selected {rows} rows but only {left} slots are free. Remove keywords or a device.",
+      "cancel": "Cancel",
+      "submit": "{count, plural, one {Add # keyword} other {Add # keywords}}",
+      "added": "Added: {added}, skipped (already tracked): {skipped}"
+    },
+    "history": {
+      "close": "Close",
+      "description": "Position history of the project and competitors (higher = better)",
+      "empty": "No checks for this keyword yet.",
+      "notRanked": "not in top 100"
+    },
+    "columns": {
+      "keyword": "Keyword",
+      "position": "Position",
+      "change1d": "1 day",
+      "change7d": "7 days",
+      "change30d": "30 days",
+      "best": "Best",
+      "trend": "History",
+      "volume": "Volume",
+      "traffic": "Traffic",
+      "url": "Page",
+      "features": "SERP features"
+    },
+    "keywords": {
+      "title": "Tracked keywords",
+      "confirmRemove": "Stop tracking {count, plural, one {# keyword} other {# keywords}}? Their history is kept.",
+      "removed": "{count, plural, one {Removed # keyword} other {Removed # keywords}}",
+      "tagged": "Tag \"{tag}\" added to {count, plural, one {# keyword} other {# keywords}}",
+      "openHistory": "History of {keyword}",
+      "search": "Search keywords",
+      "tag": "Tag",
+      "allTags": "All tags",
+      "changes": "Changes",
+      "changeOptions": {
+        "all": "All",
+        "up": "Up",
+        "down": "Down",
+        "new": "New in top 100",
+        "lost": "Lost"
+      },
+      "ranges": {
+        "all": "All positions",
+        "top3": "Top 3",
+        "top10": "Top 10",
+        "p11_20": "11–20",
+        "p21_100": "21–100"
+      },
+      "results": "{count, plural, one {# keyword} other {# keywords}}",
+      "usage": "{used} of {max} used on your plan",
+      "selectRow": "Select {keyword}",
+      "noResults": "No keywords match these filters",
+      "selected": "{count, plural, one {# selected} other {# selected}}",
+      "tagPlaceholder": "tag",
+      "addTag": "Add tag",
+      "remove": "Stop tracking"
+    },
+    "alerts": {
+      "title": "Rank alerts",
+      "description": "Get an email when rankings change significantly",
+      "rules": "Rules",
+      "noRules": "You have no alert rules yet.",
+      "forTag": "tag \"{tag}\"",
+      "forAll": "All keywords",
+      "enable": "Enable",
+      "disable": "Disable",
+      "delete": "Delete rule",
+      "events": "Recent alerts",
+      "noEvents": "No alerts yet",
+      "noEventsBody": "Triggered rules appear here after the daily check.",
+      "new": "New rule",
+      "newHint": "Rules are evaluated after every rank check; you get one email with all changes.",
+      "type": "When",
+      "topN": "Top N",
+      "positions": "By at least how many positions",
+      "tag": "For keywords tagged",
+      "emails": "Emails",
+      "emailsPlaceholder": "seo@example.com",
+      "emailsHint": "Up to 10 addresses, comma separated. Empty = your email.",
+      "create": "Create rule",
+      "created": "Rule created",
+      "sent": "Sent",
+      "notSent": "Not sent",
+      "types": {
+        "position_drop": "Dropped by at least {n} positions",
+        "position_gain": "Gained at least {n} positions",
+        "enter_top": "Entered the top {n}",
+        "leave_top": "Left the top {n}"
+      },
+      "short": {
+        "position_drop": "Drop",
+        "position_gain": "Gain",
+        "enter_top": "Entered top N",
+        "leave_top": "Left top N"
+      },
+      "columns": {
+        "date": "Date",
+        "keyword": "Keyword",
+        "rule": "Rule",
+        "change": "Change",
+        "notified": "Email"
+      }
     }
   }
 }
