@@ -39,6 +39,7 @@ const CLICKHOUSE_TABLES = [
   'domain_metrics',
   'provider_usage',
   'domain_overviews',
+  'rank_competitor_history',
 ];
 
 export async function resetDb(db: Database, ch?: ClickHouseClient) {
@@ -88,4 +89,22 @@ export async function signUpWithOrg(app: INestApplication, orgName = 'Acme') {
 /** Marks an email as verified (what clicking the verification link does). */
 export async function verifyEmail(db: Database, email: string) {
   await db.update(schema.user).set({ emailVerified: true }).where(eq(schema.user.email, email));
+}
+
+/** Invites a new user into the owner's organization as viewer and activates it. */
+export async function joinAsViewer(
+  app: INestApplication,
+  db: Database,
+  owner: { agent: TestAgent; orgId: string },
+) {
+  const email = uniqueEmail('viewer');
+  const inv = await owner.agent
+    .post('/api/v1/organization/invitations')
+    .send({ email, role: 'viewer' });
+  if (inv.status !== 201) throw new Error(`invite failed: ${inv.status}`);
+  const viewer = await signUp(app, { email });
+  await verifyEmail(db, email);
+  await viewer.agent.post(`/api/v1/invitations/${inv.body.id}/accept`).expect(201);
+  await viewer.agent.post(`/api/v1/organizations/${owner.orgId}/activate`).expect(204);
+  return viewer;
 }

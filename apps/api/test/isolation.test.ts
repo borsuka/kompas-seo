@@ -45,6 +45,15 @@ describe('Tenant isolation between organizations', () => {
       .delete(`/api/v1/projects/${project.body.id}/competitors/${competitor.body.id}`)
       .expect(404);
     await b.agent.get(`/api/v1/jobs/${job.body.id}`).expect(404);
+    // Competitor discovery and rank tracking of the project
+    await b.agent.get(`/api/v1/projects/${project.body.id}/competitors/discover`).expect(404);
+    await b.agent.get(`/api/v1/projects/${project.body.id}/rankings`).expect(404);
+    await b.agent.get(`/api/v1/projects/${project.body.id}/rankings/summary`).expect(404);
+    await b.agent
+      .post(`/api/v1/projects/${project.body.id}/rankings/keywords`)
+      .send({ keywords: ['x'] })
+      .expect(404);
+    await b.agent.get(`/api/v1/projects/${project.body.id}/rankings/alerts`).expect(404);
 
     // Selecting org A explicitly does not help: membership is checked
     await b.agent.get('/api/v1/projects').set('x-org-id', a.orgId).expect(404);

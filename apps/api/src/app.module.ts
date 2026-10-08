@@ -12,6 +12,7 @@ import { RedisThrottlerStorage } from './common/throttler-redis.storage.js';
 import { API_ENV, loadApiEnv, type ApiEnv } from './config/env.js';
 import { CreditsModule } from './credits/credits.module.js';
 import { DomainsModule } from './domains/domains.module.js';
+import { RankingsModule } from './rankings/rankings.module.js';
 import { HealthModule } from './health/health.controller.js';
 import { InfraModule } from './infra/infra.module.js';
 import { REDIS } from './infra/tokens.js';
@@ -65,6 +66,7 @@ const env = loadApiEnv();
     KeywordsModule,
     KeywordListsModule,
     DomainsModule,
+    RankingsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AppErrorFilter },
