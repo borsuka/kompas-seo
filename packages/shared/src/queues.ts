@@ -5,6 +5,7 @@ export const QUEUES = {
   system: 'system',
   credits: 'credits',
   keywords: 'keywords',
+  rankings: 'rankings',
 } as const;
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
 
@@ -13,6 +14,8 @@ export const JOB_TYPES = [
   'system.demo-progress',
   'credits.monthly-grant',
   'keywords.cluster',
+  'rankings.schedule',
+  'rankings.check',
 ] as const;
 export const jobTypeSchema = z.enum(JOB_TYPES);
 export type JobType = z.infer<typeof jobTypeSchema>;
@@ -21,7 +24,18 @@ export const JOB_QUEUE: Record<JobType, QueueName> = {
   'system.demo-progress': QUEUES.system,
   'credits.monthly-grant': QUEUES.credits,
   'keywords.cluster': QUEUES.keywords,
+  'rankings.schedule': QUEUES.rankings,
+  'rankings.check': QUEUES.rankings,
 };
+
+export interface RankCheckJobInput {
+  projectId: string;
+  /** Limit the check to these tracked keywords (default: all of the project). */
+  trackedKeywordIds?: string[];
+  trigger: 'schedule' | 'manual';
+  /** Credits charged up front by the API (manual checks); the worker charges scheduled ones. */
+  creditsCharged: number;
+}
 
 export interface ClusterJobInput {
   listId: string;

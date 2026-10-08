@@ -15,6 +15,13 @@
       "when": 1791398042458,
       "tag": "0001_keyword_lists",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791447987077,
+      "tag": "0002_rank_tracking",
+      "breakpoints": true
     }
   ]
 }

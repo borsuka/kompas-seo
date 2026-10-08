@@ -23,6 +23,8 @@ export const STATEMENTS = {
   billing: ['read', 'manage'],
   apiKey: ['read', 'manage'],
   report: ['read', 'create'],
+  /** Tracked keywords and rank alerts of a project. */
+  rankTracking: ['read', 'update'],
   /** Running research that queries data providers and spends credits. */
   research: ['run'],
 } as const;
@@ -57,6 +59,7 @@ export const ROLE_GRANTS: Record<Role, Grants> = {
     apiKey: all('apiKey'),
     report: all('report'),
     research: all('research'),
+    rankTracking: all('rankTracking'),
   },
   member: {
     organization: ['read'],
@@ -67,6 +70,7 @@ export const ROLE_GRANTS: Record<Role, Grants> = {
     credits: ['read'],
     report: all('report'),
     research: all('research'),
+    rankTracking: all('rankTracking'),
   },
   viewer: readOnly,
 };

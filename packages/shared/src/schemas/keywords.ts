@@ -155,7 +155,7 @@ export type KeywordOverview = z.infer<typeof keywordOverviewSchema>;
 
 // --- Keyword lists ------------------------------------------------------------------
 
-const tagSchema = z.string().trim().min(1).max(40);
+export const tagSchema = z.string().trim().min(1).max(40);
 
 export const createKeywordListSchema = z.object({
   name: z.string().trim().min(1).max(100),

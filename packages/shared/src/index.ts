@@ -11,3 +11,4 @@ export * from './schemas/api.js';
 export * from './schemas/keywords.js';
 export * from './keyword-filters.js';
 export * from './schemas/domains.js';
+export * from './schemas/rankings.js';
