@@ -2,7 +2,14 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 0 (foundation)** — accounts, organizations and roles, projects and competitors, credits, background jobs, data provider layer with a fully offline `MockProvider`, bilingual UI shell.
+> Status: **Phase 1 (keywords)**:
+>
+> - Keyword Explorer with server-side filters, sorting and export.
+> - Keyword Overview with KD, parent topic, traffic potential and the SERP top 10.
+> - Keyword lists with notes, tags, SERP clustering and CSV/XLSX export.
+> - DataForSEO provider for keywords and SERP.
+>
+> Built on Phase 0: accounts, organizations and roles, projects, credits, background jobs and the bilingual UI.
 
 ## Requirements
 
@@ -51,7 +58,8 @@ pnpm db:migrate   # apply Postgres + ClickHouse migrations
 
 All configuration is environment-based; see [.env.example](.env.example) for every variable and its purpose. Highlights:
 
-- `KEYWORD_PROVIDER`, `SERP_PROVIDER`, `DOMAIN_PROVIDER`, `BACKLINK_PROVIDER`: `mock` (default) or `dataforseo` (from Phase 1).
+- `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` and `BACKLINK_PROVIDER` follow in Phases 2 and 4.
+- `ANTHROPIC_API_KEY`: optional; enables Claude for classifying ambiguous search intent.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: enable "Continue with Google".
 - `CREDIT_COSTS_JSON`: override credit prices per operation.
 - `BILLING_ENABLED`: Stripe (Phase 6) stays off without keys.

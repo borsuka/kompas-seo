@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords · 2. Domains and competitors · 3. Rank tracking · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors · 3. Rank tracking · 4. Backlinks · 5. GSC and content · 6. Monetization and polish.
 
 ## Architecture
 
@@ -17,7 +17,7 @@ apps/worker              BullMQ workers (background jobs, schedules) + health en
 packages/shared          zod schemas, API contracts, permissions, plans, credit costs, env, crypto
 packages/db              Drizzle schema + migrations (Postgres), ClickHouse client + SQL migrations, shared DB ops
 packages/data-providers  Provider interfaces, MockProvider, middleware (cache/dedup/retry/breaker/usage)
-packages/seo-core        Pure SEO algorithms (KD, CTR, traffic, intent, clustering) — from Phase 1
+packages/seo-core        Pure SEO algorithms: CTR curve, traffic + GSC calibration, KD, intent rules, clustering
 packages/ui              shadcn-style components on radix-ui (source-only, transpiled by Next)
 packages/config          Shared tsconfig presets and Vitest defaults
 ```
@@ -55,6 +55,16 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 7. **Errors**: throw `AppError(code, message, details)`; the global filter maps it to `{ code, message, details, requestId }`.
 8. **Secrets** come from env only; document every variable in `.env.example`. OAuth tokens are encrypted with `encryptSecret` (AES-256-GCM, `ENCRYPTION_KEY`).
 9. **Migrations** are append-only. Postgres: drizzle-kit generated SQL in `packages/db/drizzle`. ClickHouse: numbered files in `packages/db/clickhouse/migrations` (checksums are verified; never edit an applied file).
+
+## Keyword research (Phase 1)
+
+- API modules: `apps/api/src/keywords` (explorer, overview), `apps/api/src/keyword-lists` (lists, items, clustering), `apps/api/src/llm` (`LLMProvider` + `IntentService`).
+- Stored data is reused before calling a provider again (`FRESHNESS` in `keywords.service.ts`): keyword metrics and idea sets 30 days, SERP 24 h, top-10 page metrics 7 days. Only fetches spend credits.
+- ClickHouse reads and writes for keywords and SERPs go through `packages/db/src/clickhouse/keyword-store.ts`. Use query parameters (`{name:Type}`) only and never interpolate values.
+- Spending credits needs `research:run`. Viewers can read stored research but not trigger new provider calls.
+- Intent: provider intent, then BG/EN rules (`seo-core/intent.ts`), then Claude for ambiguous keywords (batches of up to 100, cached 30 days in Redis). Without `ANTHROPIC_API_KEY` only rules are used.
+- Clustering is the `keywords.cluster` job. The API charges `keyword.clusterSerp` per keyword without a stored SERP, the worker fetches the missing SERPs and refunds if the job finally fails.
+- In-memory filters and sorting for lists (`packages/shared/src/keyword-filters.ts`) mirror the ClickHouse explorer filters. Keep them in sync.
 
 ## Conventions
 
