@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@seo/ui/dropdown-menu';
 import { Skeleton } from '@seo/ui/skeleton';
+import { MetricInfo, type MetricKey } from '@/components/metric-tooltip';
 
 export interface DataColumn<T> {
   id: string;
@@ -19,6 +20,8 @@ export interface DataColumn<T> {
   /** Plain-text header for menus and mobile cards. */
   label: string;
   cell: (row: T) => ReactNode;
+  /** Adds an info tooltip explaining the metric next to the header. */
+  metric?: MetricKey;
   /** Server sort field; makes the header clickable. */
   sortKey?: string;
   align?: 'left' | 'right';
@@ -218,22 +221,30 @@ export function DataTable<T>({
                     c.align === 'right' ? 'text-right' : 'text-left',
                   )}
                 >
-                  {c.sortKey && onSort ? (
-                    <button
-                      type="button"
-                      onClick={() => onSort(c.sortKey!)}
-                      aria-label={t('sortBy', { column: c.label })}
-                      className={cn(
-                        'hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1 rounded-sm focus-visible:ring-2 focus-visible:outline-none',
-                        c.align === 'right' && 'flex-row-reverse',
-                      )}
-                    >
-                      {c.header}
-                      {sortIcon(c.sortKey)}
-                    </button>
-                  ) : (
-                    c.header
-                  )}
+                  <span
+                    className={cn(
+                      'inline-flex items-center gap-1',
+                      c.align === 'right' && 'flex-row-reverse',
+                    )}
+                  >
+                    {c.metric && <MetricInfo metric={c.metric} />}
+                    {c.sortKey && onSort ? (
+                      <button
+                        type="button"
+                        onClick={() => onSort(c.sortKey!)}
+                        aria-label={t('sortBy', { column: c.label })}
+                        className={cn(
+                          'hover:text-foreground focus-visible:ring-ring inline-flex items-center gap-1 rounded-sm focus-visible:ring-2 focus-visible:outline-none',
+                          c.align === 'right' && 'flex-row-reverse',
+                        )}
+                      >
+                        {c.header}
+                        {sortIcon(c.sortKey)}
+                      </button>
+                    ) : (
+                      c.header
+                    )}
+                  </span>
                 </th>
               ))}
             </tr>

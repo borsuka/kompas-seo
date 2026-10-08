@@ -122,7 +122,8 @@ export function KeywordOverviewView() {
     {
       id: 'traffic',
       label: t('overview.traffic'),
-      header: <MetricLabel metric="traffic" label={t('overview.traffic')} />,
+      header: t('overview.traffic'),
+      metric: 'traffic',
       align: 'right',
       cell: (r) => format.number(r.estTraffic),
     },

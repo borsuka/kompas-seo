@@ -15,7 +15,6 @@ import { FeatureList, IntentBadges, KdBadge, Sparkline } from '@/components/keyw
 import { ExportMenu } from '@/components/keywords/export-menu';
 import { FilterBar, FILTER_KEYS } from '@/components/keywords/filter-bar';
 import { KeywordsTabs } from '@/components/keywords/keywords-tabs';
-import { MetricLabel } from '@/components/metric-tooltip';
 import { PageHeader } from '@/components/page-header';
 import { ErrorState } from '@/components/states';
 import { Link, useRouter } from '@/i18n/navigation';
@@ -185,14 +184,16 @@ export function KeywordListDetail({ id }: { id: string }) {
     {
       id: 'intent',
       label: t('columns.intent'),
-      header: <MetricLabel metric="intent" label={t('columns.intent')} />,
+      header: t('columns.intent'),
+      metric: 'intent',
       hideable: true,
       cell: (r) => <IntentBadges intents={r.intent} />,
     },
     {
       id: 'volume',
       label: t('columns.volume'),
-      header: <MetricLabel metric="volume" label={t('columns.volume')} />,
+      header: t('columns.volume'),
+      metric: 'volume',
       sortKey: 'volume',
       align: 'right',
       cell: (r) => format.number(r.volume),
@@ -208,7 +209,8 @@ export function KeywordListDetail({ id }: { id: string }) {
     {
       id: 'kd',
       label: t('columns.kd'),
-      header: <MetricLabel metric="kd" label={t('columns.kd')} />,
+      header: t('columns.kd'),
+      metric: 'kd',
       sortKey: 'kd',
       align: 'right',
       hideable: true,

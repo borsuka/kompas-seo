@@ -14,7 +14,6 @@ import { ExportMenu } from '@/components/keywords/export-menu';
 import { FilterBar, FILTER_KEYS } from '@/components/keywords/filter-bar';
 import { KeywordsTabs } from '@/components/keywords/keywords-tabs';
 import { LocalePicker } from '@/components/keywords/locale-picker';
-import { MetricLabel } from '@/components/metric-tooltip';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState, ErrorState } from '@/components/states';
 import { Link } from '@/i18n/navigation';
@@ -85,14 +84,16 @@ export function KeywordExplorer() {
     {
       id: 'intent',
       label: t('columns.intent'),
-      header: <MetricLabel metric="intent" label={t('columns.intent')} />,
+      header: t('columns.intent'),
+      metric: 'intent',
       hideable: true,
       cell: (r) => <IntentBadges intents={r.intent} />,
     },
     {
       id: 'volume',
       label: t('columns.volume'),
-      header: <MetricLabel metric="volume" label={t('columns.volume')} />,
+      header: t('columns.volume'),
+      metric: 'volume',
       sortKey: 'volume',
       align: 'right',
       cell: (r) => format.number(r.volume),
@@ -107,7 +108,8 @@ export function KeywordExplorer() {
     {
       id: 'kd',
       label: t('columns.kd'),
-      header: <MetricLabel metric="kd" label={t('columns.kd')} />,
+      header: t('columns.kd'),
+      metric: 'kd',
       sortKey: 'kd',
       align: 'right',
       hideable: true,
@@ -116,7 +118,8 @@ export function KeywordExplorer() {
     {
       id: 'cpc',
       label: t('columns.cpc'),
-      header: <MetricLabel metric="cpc" label={t('columns.cpc')} />,
+      header: t('columns.cpc'),
+      metric: 'cpc',
       sortKey: 'cpc',
       align: 'right',
       hideable: true,
@@ -126,7 +129,8 @@ export function KeywordExplorer() {
     {
       id: 'competition',
       label: t('columns.competition'),
-      header: <MetricLabel metric="competition" label={t('columns.competition')} />,
+      header: t('columns.competition'),
+      metric: 'competition',
       sortKey: 'competition',
       align: 'right',
       hideable: true,
