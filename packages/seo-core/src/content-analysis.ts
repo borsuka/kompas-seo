@@ -119,7 +119,7 @@ export function analyzeTopPages(
   const minPages = Math.max(2, Math.ceil(n * (opts.minCoverage ?? 0.3)));
   const terms = [...docFreq.entries()]
     // The keyword's own words are a given; recommend the surrounding vocabulary.
-    .filter(([term, d]) => d.pages >= minPages && !(kwTokens.has(term) && !term.includes(' ')))
+    .filter(([term, d]) => d.pages >= minPages && !term.split(' ').every((w) => kwTokens.has(w)))
     .map(([term, d]) => ({
       term,
       pages: d.pages,

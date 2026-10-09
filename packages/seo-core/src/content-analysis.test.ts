@@ -42,6 +42,8 @@ describe('analyzeTopPages', () => {
     // Keyword words alone and stopwords are not recommended.
     expect(terms).not.toContain('избелване');
     expect(terms).not.toContain('на');
+    // Neither are phrases made only of the keyword's own words.
+    expect(terms).not.toContain('избелване зъби');
     expect(a.terms[0]!.coverage).toBe(1);
     expect(a.schemaTypes[0]).toEqual({ type: 'Article', pages: 7 });
     expect(a.keywordInH1).toBe(1);
