@@ -17,6 +17,7 @@ import { BacklinksModule } from './backlinks/backlinks.module.js';
 import { ContentModule } from './content/content.module.js';
 import { GscModule } from './gsc/gsc.module.js';
 import { ApiKeysModule } from './api-keys/api-keys.module.js';
+import { PrivacyModule } from './privacy/privacy.module.js';
 import { HealthModule } from './health/health.controller.js';
 import { InfraModule } from './infra/infra.module.js';
 import { REDIS } from './infra/tokens.js';
@@ -75,6 +76,7 @@ const env = loadApiEnv();
     ContentModule,
     GscModule,
     ApiKeysModule,
+    PrivacyModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AppErrorFilter },

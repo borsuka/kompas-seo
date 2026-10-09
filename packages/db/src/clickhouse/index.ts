@@ -5,3 +5,4 @@ export * from './domain-store.js';
 export * from './rank-store.js';
 export * from './backlink-store.js';
 export * from './gsc-store.js';
+export * from './privacy-store.js';

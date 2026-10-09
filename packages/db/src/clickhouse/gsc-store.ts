@@ -174,5 +174,6 @@ export async function deleteGscProject(ch: ClickHouseClient, projectId: string) 
   await ch.command({
     query: 'ALTER TABLE gsc_daily DELETE WHERE project_id = {project:UUID}',
     query_params: { project: projectId },
+    clickhouse_settings: { mutations_sync: '1' },
   });
 }
