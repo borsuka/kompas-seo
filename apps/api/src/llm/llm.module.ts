@@ -1,7 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { API_ENV, type ApiEnv } from '../config/env.js';
 import { IntentService } from './intent.service.js';
-import { AnthropicLLMProvider, DisabledLLMProvider, LLM_PROVIDER } from './llm.provider.js';
+import { AnthropicLLMProvider, DisabledLLMProvider, LLM_PROVIDER } from '@seo/llm';
 
 @Global()
 @Module({

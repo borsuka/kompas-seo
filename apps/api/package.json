@@ -13,15 +13,16 @@
     "db:seed": "node --enable-source-maps dist/scripts/seed.js"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.131.0",
     "@nestjs/common": "^12.1.2",
     "@nestjs/core": "^12.1.2",
     "@nestjs/platform-express": "^12.1.2",
     "@nestjs/swagger": "^12.0.2",
     "@nestjs/throttler": "^6.7.1",
     "@sentry/nestjs": "^11.4.0",
+    "@seo/crawler": "workspace:*",
     "@seo/data-providers": "workspace:*",
     "@seo/db": "workspace:*",
+    "@seo/llm": "workspace:*",
     "@seo/seo-core": "workspace:*",
     "@seo/shared": "workspace:*",
     "better-auth": "^1.7.7",

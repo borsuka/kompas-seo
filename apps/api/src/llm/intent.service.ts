@@ -3,7 +3,7 @@ import type { Redis } from 'ioredis';
 import { classifyIntent } from '@seo/seo-core';
 import type { Intent, KeywordMetrics } from '@seo/shared';
 import { REDIS } from '../infra/tokens.js';
-import { LLM_PROVIDER, type LLMProvider } from './llm.provider.js';
+import { LLM_PROVIDER, type LLMProvider } from '@seo/llm';
 
 const CACHE_TTL_SEC = 30 * 86_400;
 const BATCH = 100;
