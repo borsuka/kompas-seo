@@ -29,6 +29,13 @@
       "when": 1791478580393,
       "tag": "0003_disavow",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791540133945,
+      "tag": "0004_content_gsc",
+      "breakpoints": true
     }
   ]
 }
