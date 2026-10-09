@@ -24,6 +24,7 @@ import {
 import { loadRootEnv, parseEnv, workerEnvSchema } from '@seo/shared/server';
 import { startHealthServer } from './health.js';
 import { createMailer } from './mailer.js';
+import { MockCrawler } from './mock-crawler.js';
 import { PROCESSORS } from './processors/index.js';
 import { tracked, type WorkerDeps } from './runtime.js';
 
@@ -77,7 +78,8 @@ const deps: WorkerDeps = {
     env.ANTHROPIC_API_KEY && env.NODE_ENV !== 'test'
       ? new AnthropicLLMProvider(env.ANTHROPIC_API_KEY, env.ANTHROPIC_MODEL)
       : new DisabledLLMProvider(),
-  crawler: new Crawler(robotsCache),
+  // The mock SERP links to fictional sites: synthesize their pages in local development.
+  crawler: env.SERP_PROVIDER === 'mock' ? new MockCrawler() : new Crawler(robotsCache),
   gsc: {
     google: new GoogleGscClient(),
     mock: new MockGscClient(),

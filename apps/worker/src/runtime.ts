@@ -3,7 +3,7 @@ import type { Redis } from 'ioredis';
 import type { Logger } from 'pino';
 import { updateJob, type Database } from '@seo/db';
 import type { ClickHouseClient } from '@seo/db/clickhouse';
-import type { Crawler } from '@seo/crawler';
+import type { CrawlResult } from '@seo/crawler';
 import type { GoogleOAuth, GscClient, ProviderSet } from '@seo/data-providers';
 import type { LLMProvider } from '@seo/llm';
 import {
@@ -17,6 +17,12 @@ import {
 } from '@seo/shared';
 import type { Mailer } from './mailer.js';
 
+/** What a page is expected to be about (only the mock crawler uses it). */
+export interface CrawlHint {
+  keyword: string;
+  language: string;
+}
+
 export interface WorkerDeps {
   db: Database;
   redis: Redis;
@@ -28,7 +34,7 @@ export interface WorkerDeps {
   appUrl: string;
   creditCosts: Record<ProviderOperation, CreditCost>;
   llm: LLMProvider;
-  crawler: Crawler;
+  crawler: { crawl(url: string, hint?: CrawlHint): Promise<CrawlResult> };
   /** Search Console: Google client + OAuth (when configured) and the mock. */
   gsc: { google: GscClient; mock: GscClient; oauth: GoogleOAuth | null };
   /** For decrypting stored OAuth tokens. */

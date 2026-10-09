@@ -74,7 +74,10 @@ export const buildBrief: Processor<BriefJobInput, BriefJobResult> = async (input
     const work = async () => {
       while (next < organic.length) {
         const o = organic[next++]!;
-        const res = await crawler.crawl(o.url);
+        const res = await crawler.crawl(o.url, {
+          keyword: brief.keyword,
+          language: brief.languageCode,
+        });
         if (res.ok && !res.page.noindex) {
           analyzed.push({
             url: o.url,

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { extractPage, type Crawler } from '@seo/crawler';
+import { extractPage } from '@seo/crawler';
 import { GoogleAuthError, type GoogleOAuth } from '@seo/data-providers';
 import { applyCreditEntry, eq, getCreditBalance, schema, type Database } from '@seo/db';
 import { gscDaily, type ClickHouseClient } from '@seo/db/clickhouse';
@@ -8,6 +8,8 @@ import { truncateAll } from '@seo/db/testing';
 import { DisabledLLMProvider, type LLMProvider } from '@seo/llm';
 import type { ContentBrief } from '@seo/shared';
 import { encryptSecret } from '@seo/shared/server';
+import type { WorkerDeps } from '../runtime.js';
+import { MockCrawler } from '../mock-crawler.js';
 import { makeContext, setupTestDatabases } from '../testing.js';
 import { buildBrief } from './content.js';
 import { gscTokenAad, scheduleGsc, syncGsc } from './gsc.js';
@@ -55,7 +57,7 @@ const fakeCrawler = {
     </main></body></html>`;
     return { ok: true as const, page: extractPage(html, url), status: 200, finalUrl: url };
   },
-} as unknown as Crawler;
+} as unknown as WorkerDeps['crawler'];
 
 describe('content.brief', () => {
   async function seedBrief() {
@@ -124,11 +126,27 @@ describe('content.brief', () => {
     expect(row!.brief).toEqual(aiBrief);
   });
 
+  it('gets realistic synthetic pages from the mock crawler (local development)', async () => {
+    const { orgId, briefId } = await seedBrief();
+    const { ctx } = makeContext({ db, ch }, orgId, { crawler: new MockCrawler() });
+    const res = await buildBrief({ briefId, creditsCharged: 0 }, ctx);
+    expect(res.pagesAnalyzed).toBe(10);
+    const [row] = await db
+      .select()
+      .from(schema.contentBriefs)
+      .where(eq(schema.contentBriefs.id, briefId));
+    const analysis = row!.analysis as { wordCount: { median: number }; topics: unknown[] };
+    expect(analysis.wordCount.median).toBeGreaterThan(100);
+    expect(analysis.topics.length).toBeGreaterThan(2);
+  });
+
   it('marks the brief failed and refunds on the final attempt', async () => {
     const { orgId, briefId } = await seedBrief();
     await applyCreditEntry(db, { organizationId: orgId, delta: 30, reason: 'manual_adjustment' });
     await applyCreditEntry(db, { organizationId: orgId, delta: -20, reason: 'provider_usage' });
-    const broken = { crawl: async () => Promise.reject(new Error('boom')) } as unknown as Crawler;
+    const broken = {
+      crawl: async () => Promise.reject(new Error('boom')),
+    } as unknown as WorkerDeps['crawler'];
     const { ctx } = makeContext({ db, ch }, orgId, { crawler: broken });
     await expect(buildBrief({ briefId, creditsCharged: 20 }, ctx)).rejects.toThrow('boom');
     const [row] = await db
