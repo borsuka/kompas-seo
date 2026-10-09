@@ -1,20 +1,6 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { onboard, signUpAndVerify } from './helpers';
 import { uniqueEmail, waitForEmailLink } from './mailpit';
-
-const PASSWORD = 'correct-horse-battery';
-
-async function signUpAndVerify(page: Page, name: string, email: string) {
-  await page.goto('/sign-up');
-  await page.getByLabel('Име', { exact: true }).fill(name);
-  await page.getByLabel('Имейл', { exact: true }).fill(email);
-  await page.getByLabel('Парола', { exact: true }).fill(PASSWORD);
-  await page.getByRole('button', { name: 'Регистрация' }).click();
-
-  // Email verification is required: follow the link from the email.
-  await expect(page.getByRole('heading', { name: 'Потвърдете имейла си' })).toBeVisible();
-  const link = await waitForEmailLink(email, '/api/auth/verify-email');
-  await page.goto(link);
-}
 
 test('acceptance 3.1: sign up, create org and project, invite a read-only viewer', async ({
   browser,
@@ -27,17 +13,7 @@ test('acceptance 3.1: sign up, create org and project, invite a read-only viewer
   const owner = await ownerCtx.newPage();
   await signUpAndVerify(owner, 'Иван Собственик', ownerEmail);
 
-  await expect(
-    owner.getByRole('heading', { name: 'Как се казва вашата организация?' }),
-  ).toBeVisible();
-  await owner.getByLabel('Име на организацията', { exact: true }).fill('Агенция Е2Е');
-  await owner.getByRole('button', { name: 'Създай' }).click();
-
-  await expect(owner.getByRole('heading', { name: 'Добавете своя сайт' })).toBeVisible();
-  await owner.getByLabel('Домейн', { exact: true }).fill('https://www.primer-e2e.bg/');
-  await owner.getByRole('button', { name: 'Към таблото' }).click();
-
-  await expect(owner.getByRole('heading', { name: 'Табло' })).toBeVisible();
+  await onboard(owner, 'Агенция Е2Е', 'https://www.primer-e2e.bg/');
   await expect(owner.getByText('primer-e2e.bg').first()).toBeVisible();
 
   // --- Owner invites a viewer
@@ -46,7 +22,10 @@ test('acceptance 3.1: sign up, create org and project, invite a read-only viewer
   await owner.getByRole('combobox', { name: 'Членове' }).click();
   await owner.getByRole('option', { name: 'Наблюдател' }).click();
   await owner.getByRole('button', { name: 'Покани' }).click();
-  await expect(owner.getByRole('listitem').filter({ hasText: viewerEmail })).toBeVisible();
+  // The pending invitation row (the success toast mentions the email too).
+  await expect(
+    owner.getByRole('listitem').filter({ hasText: viewerEmail }).filter({ hasText: 'Наблюдател' }),
+  ).toBeVisible();
 
   // --- Viewer: sign up from the invitation email and accept
   const inviteLink = await waitForEmailLink(viewerEmail, '/invitations/');
