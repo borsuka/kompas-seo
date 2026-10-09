@@ -6,6 +6,7 @@ export const QUEUES = {
   credits: 'credits',
   keywords: 'keywords',
   rankings: 'rankings',
+  content: 'content',
 } as const;
 export type QueueName = (typeof QUEUES)[keyof typeof QUEUES];
 
@@ -16,6 +17,9 @@ export const JOB_TYPES = [
   'keywords.cluster',
   'rankings.schedule',
   'rankings.check',
+  'content.brief',
+  'gsc.sync',
+  'gsc.schedule',
 ] as const;
 export const jobTypeSchema = z.enum(JOB_TYPES);
 export type JobType = z.infer<typeof jobTypeSchema>;
@@ -26,6 +30,9 @@ export const JOB_QUEUE: Record<JobType, QueueName> = {
   'keywords.cluster': QUEUES.keywords,
   'rankings.schedule': QUEUES.rankings,
   'rankings.check': QUEUES.rankings,
+  'content.brief': QUEUES.content,
+  'gsc.sync': QUEUES.content,
+  'gsc.schedule': QUEUES.content,
 };
 
 export interface RankCheckJobInput {

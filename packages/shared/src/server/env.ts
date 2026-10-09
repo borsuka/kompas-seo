@@ -83,6 +83,20 @@ export const encryptionEnvSchema = z.object({
     ),
 });
 
+/** Claude (intent classification, content briefs). Disabled without a key. */
+export const llmEnvSchema = z.object({
+  ANTHROPIC_API_KEY: optionalString,
+  ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
+});
+
+/** Google OAuth client (sign-in and Search Console) and the GSC data source. */
+export const googleEnvSchema = z.object({
+  GOOGLE_CLIENT_ID: optionalString,
+  GOOGLE_CLIENT_SECRET: optionalString,
+  /** `mock`: synthetic Search Console data, no Google account needed. */
+  GSC_PROVIDER: z.enum(['mock', 'google']).default('mock'),
+});
+
 export const apiEnvSchema = commonEnvSchema
   .extend(databaseEnvSchema.shape)
   .extend(clickhouseEnvSchema.shape)
@@ -90,17 +104,15 @@ export const apiEnvSchema = commonEnvSchema
   .extend(providerEnvSchema.shape)
   .extend(emailEnvSchema.shape)
   .extend(encryptionEnvSchema.shape)
+  .extend(llmEnvSchema.shape)
+  .extend(googleEnvSchema.shape)
   .extend({
     API_PORT: z.coerce.number().int().default(4000),
     APP_URL: z.string().url().default('http://localhost:3000'),
     BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters'),
     AUTH_REQUIRE_EMAIL_VERIFICATION: bool,
-    GOOGLE_CLIENT_ID: optionalString,
-    GOOGLE_CLIENT_SECRET: optionalString,
     BILLING_ENABLED: bool,
     RATE_LIMIT_PER_MINUTE: z.coerce.number().int().min(1).default(300),
-    ANTHROPIC_API_KEY: optionalString,
-    ANTHROPIC_MODEL: z.string().default('claude-opus-5-5'),
   });
 export type ApiEnv = z.infer<typeof apiEnvSchema>;
 
@@ -110,6 +122,9 @@ export const workerEnvSchema = commonEnvSchema
   .extend(redisEnvSchema.shape)
   .extend(providerEnvSchema.shape)
   .extend(emailEnvSchema.shape)
+  .extend(encryptionEnvSchema.shape)
+  .extend(llmEnvSchema.shape)
+  .extend(googleEnvSchema.shape)
   .extend({
     WORKER_HEALTH_PORT: z.coerce.number().int().default(4001),
     APP_URL: z.string().url().default('http://localhost:3000'),

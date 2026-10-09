@@ -17,6 +17,8 @@ export const PROVIDER_OPERATIONS = [
   'keyword.clusterSerp',
   /** One rank check of a tracked keyword (SERP top 100). */
   'rank.check',
+  /** Content brief: SERP top 10, crawl + analysis of the ranking pages, AI outline. */
+  'content.brief',
 ] as const;
 export const providerOperationSchema = z.enum(PROVIDER_OPERATIONS);
 export type ProviderOperation = z.infer<typeof providerOperationSchema>;
@@ -44,6 +46,7 @@ export const DEFAULT_CREDIT_COSTS: Record<ProviderOperation, CreditCost> = {
   'serp.pageMetrics': { base: 10, perUnit: 0, unitSize: 1 },
   'keyword.clusterSerp': { base: 0, perUnit: 1, unitSize: 1 },
   'rank.check': { base: 0, perUnit: 1, unitSize: 1 },
+  'content.brief': { base: 20, perUnit: 0, unitSize: 1 },
 };
 
 const creditCostSchema = z.object({
