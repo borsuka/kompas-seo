@@ -39,6 +39,11 @@ export async function createApp(): Promise<INestApplication> {
 
   const http = app.getHttpAdapter().getInstance() as express.Express;
   http.all('/api/auth/{*any}', toNodeHandler(auth));
+  // Stripe signs the exact bytes: keep the webhook body raw (later parsers skip it).
+  http.use(
+    `/${API_PREFIX}/billing/webhook`,
+    express.raw({ type: 'application/json', limit: '1mb' }),
+  );
   http.use(express.json({ limit: '1mb' }));
   http.use(express.urlencoded({ extended: false, limit: '1mb' }));
   http.use(`/${API_PREFIX}`, csrfOriginCheck(env.APP_URL));

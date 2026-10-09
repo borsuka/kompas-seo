@@ -38,6 +38,8 @@ export async function grantMonthlyCredits(
   organizationId: string,
   plan: PlanId,
   now = new Date(),
+  /** Defaults to one grant per calendar month; Stripe uses one per paid invoice. */
+  idempotencyKey = planGrantKey(now),
 ) {
   const target = PLANS[plan].monthlyCredits;
   const balance = await getCreditBalance(db, organizationId);
@@ -47,6 +49,6 @@ export async function grantMonthlyCredits(
     delta,
     reason: 'plan_grant',
     description: `${plan} plan · ${now.toISOString().slice(0, 7)}`,
-    idempotencyKey: planGrantKey(now),
+    idempotencyKey,
   });
 }

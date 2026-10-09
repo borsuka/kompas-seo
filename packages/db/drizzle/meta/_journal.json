@@ -43,6 +43,13 @@
       "when": 1791542713384,
       "tag": "0005_api_keys",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791543467926,
+      "tag": "0006_billing",
+      "breakpoints": true
     }
   ]
 }

@@ -97,6 +97,14 @@ export const googleEnvSchema = z.object({
   GSC_PROVIDER: z.enum(['mock', 'google']).default('mock'),
 });
 
+/** Stripe (only used when BILLING_ENABLED=true). Prices are recurring monthly prices. */
+export const billingEnvSchema = z.object({
+  STRIPE_SECRET_KEY: optionalString,
+  STRIPE_WEBHOOK_SECRET: optionalString,
+  STRIPE_PRICE_PRO: optionalString,
+  STRIPE_PRICE_AGENCY: optionalString,
+});
+
 export const apiEnvSchema = commonEnvSchema
   .extend(databaseEnvSchema.shape)
   .extend(clickhouseEnvSchema.shape)
@@ -106,6 +114,7 @@ export const apiEnvSchema = commonEnvSchema
   .extend(encryptionEnvSchema.shape)
   .extend(llmEnvSchema.shape)
   .extend(googleEnvSchema.shape)
+  .extend(billingEnvSchema.shape)
   .extend({
     API_PORT: z.coerce.number().int().default(14000),
     APP_URL: z.string().url().default('http://localhost:3000'),

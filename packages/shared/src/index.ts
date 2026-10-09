@@ -16,3 +16,4 @@ export * from './schemas/backlinks.js';
 export * from './schemas/content.js';
 export * from './schemas/gsc.js';
 export * from './schemas/api-keys.js';
+export * from './schemas/billing.js';
