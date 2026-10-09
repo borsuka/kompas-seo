@@ -107,7 +107,7 @@ export const apiEnvSchema = commonEnvSchema
   .extend(llmEnvSchema.shape)
   .extend(googleEnvSchema.shape)
   .extend({
-    API_PORT: z.coerce.number().int().default(4000),
+    API_PORT: z.coerce.number().int().default(14000),
     APP_URL: z.string().url().default('http://localhost:3000'),
     BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters'),
     AUTH_REQUIRE_EMAIL_VERIFICATION: bool,

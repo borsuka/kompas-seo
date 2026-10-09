@@ -2,7 +2,13 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 4 (backlinks)**:
+> Status: **Phase 5 (Search Console and content)**:
+>
+> - Content briefs: analysis of the Google top 10 (length, headings, terms, questions, schema) and an outline written by Claude, with a template fallback; Markdown export.
+> - Google Search Console: OAuth connection, daily sync, clicks/impressions/CTR/position by query and page, cannibalization and traffic-estimate calibration.
+> - A safe crawler (robots.txt, SSRF protection) for the pages we analyze.
+>
+> Phase 4 (backlinks):
 >
 > - Backlink profile: rating, referring domains, new/lost per month, anchors by type, rel and TLD split.
 > - Backlinks and referring domains with live/new/lost/broken filters and export.
@@ -41,12 +47,12 @@ pnpm dev
 
 `pnpm dev` copies `.env.example` to `.env` (first run), starts Postgres, ClickHouse, Redis and Mailpit, applies migrations and runs all apps:
 
-| URL                                                                    | What                                                                        |
-| ---------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| http://localhost:3000                                                  | Web app (Bulgarian; English under `/en`)                                    |
-| http://localhost:4000/docs                                             | API reference (Swagger)                                                     |
-| http://localhost:18025                                                 | Mailpit: every email the app sends (verification, magic links, invitations) |
-| http://localhost:4000/health/ready, http://localhost:4001/health/ready | Health of API and worker                                                    |
+| URL                                                                     | What                                                                        |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| http://localhost:3000                                                   | Web app (Bulgarian; English under `/en`)                                    |
+| http://localhost:14000/docs                                             | API reference (Swagger)                                                     |
+| http://localhost:18025                                                  | Mailpit: every email the app sends (verification, magic links, invitations) |
+| http://localhost:14000/health/ready, http://localhost:4001/health/ready | Health of API and worker                                                    |
 
 ### Demo account
 

@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks (done) · 5. GSC and content · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks (done) · 5. GSC and content (done) · 6. Monetization and polish.
 
 ## Architecture
 
@@ -17,12 +17,14 @@ apps/worker              BullMQ workers (background jobs, schedules) + health en
 packages/shared          zod schemas, API contracts, permissions, plans, credit costs, env, crypto
 packages/db              Drizzle schema + migrations (Postgres), ClickHouse client + SQL migrations, shared DB ops
 packages/data-providers  Provider interfaces, MockProvider, middleware (cache/dedup/retry/breaker/usage)
-packages/seo-core        Pure SEO algorithms: CTR curve, traffic + GSC calibration, KD, intent rules, clustering
+packages/seo-core        Pure SEO algorithms: CTR, traffic + GSC calibration, KD, intent, clustering, gaps, rankings, backlinks, content
+packages/crawler         SSRF-safe fetcher, robots.txt (RFC 9309) and HTML content extraction
+packages/llm             LLMProvider (Claude): intent classification and content briefs; disabled without a key
 packages/ui              shadcn-style components on radix-ui (source-only, transpiled by Next)
 packages/config          Shared tsconfig presets and Vitest defaults
 ```
 
-Request flow: browser → `web` (localhost:3000) → Next rewrite `/api/*` → `api` (localhost:4000). The browser only sees one origin, so auth cookies are first-party.
+Request flow: browser → `web` (localhost:3000) → Next rewrite `/api/*` → `api` (localhost:14000). The browser only sees one origin, so auth cookies are first-party.
 
 Data stores:
 
@@ -89,6 +91,14 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 - One snapshot per target = summary + top 1000 backlinks (live and lost) + top 1000 referring domains, stored in ClickHouse (`backlink-store.ts`) with a shared `updated_at` and reused for 7 days (`BACKLINK_FRESH_DAYS`). Lists, anchors, link gap and toxicity are computed from the snapshot, so they cost nothing after the first fetch.
 - DataForSEO Backlinks API (`dataforseo-backlinks.ts`): `summary/live`, `backlinks/live`, `referring_domains/live` with `rank_scale: one_hundred`. Dates arrive as `2019-11-15 12:57:46 +00:00` (`parseDfsDate`).
 - Toxicity is conservative on purpose (disavowing good links hurts): the provider spam score is a floor, our signals add on top. Disavow entries live in Postgres (`disavow_entries`) and export as a Google disavow file.
+
+## GSC and content (Phase 5)
+
+- Crawling third-party pages only goes through `@seo/crawler`: http(s) on ports 80/443, no credentials, DNS answers validated at connect time (no private, loopback, link-local/metadata or CGNAT addresses; no DNS rebinding), every redirect hop re-validated, size/time limits, and robots.txt checked before every hop (5xx/unreachable robots = disallow). Never use plain `fetch` on user- or SERP-supplied URLs.
+- Content briefs (`content.brief` job, 20 credits up front, refunded on failure): SERP top 10 → crawl → `analyzeTopPages` → Claude (`@seo/llm`) or `templateBrief` when no key / on refusal. With `SERP_PROVIDER=mock` the worker uses `MockCrawler` (synthetic pages; the mock SERP links to fictional sites).
+- Search Console: Google OAuth web flow (`access_type=offline`, `prompt=consent`); the state is single use (Redis, 10 min) and bound to the user. Refresh tokens are encrypted with `encryptSecret` and AAD `gsc:<projectId>`. `GSC_PROVIDER=mock` connects sample data. The worker syncs daily (90 days first, then the last 7, one day per request, 2-day lag) into ClickHouse `gsc_daily` (read with FINAL). Disconnect revokes the token and deletes the data.
+- Cannibalization (`seo-core/cannibalization.ts`) and calibration (Σ real clicks ÷ Σ estimated, from rank tracking or the domain keyword snapshot, whichever overlaps more) are computed from `gsc_daily`.
+- ClickHouse gotcha: an alias that equals a column name (`sum(clicks) AS clicks`) shadows it in the rest of the query; use distinct aliases.
 
 ## Conventions
 
