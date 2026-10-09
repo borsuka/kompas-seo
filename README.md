@@ -2,7 +2,15 @@
 
 SEO research platform: from your keywords to your competitors' sites. Domain overview, organic competitors, keyword gap, link gap, keyword research, rank tracking and content research — with first-class Bulgarian support.
 
-> Status: **Phase 5 (Search Console and content)**:
+> Status: **Phase 6 (monetization and polish)**, all phases done:
+>
+> - Plans and Stripe billing (Checkout, customer portal, webhooks); credits top up on every paid invoice. Off unless `BILLING_ENABLED=true`.
+> - Public REST API with organization API keys (Agency plan), per-key rate limits and OpenAPI docs.
+> - PDF domain reports in Bulgarian or English (organic visibility, backlinks, rankings, Search Console).
+> - GDPR: JSON export and deletion of the account or the organization.
+> - A getting-started checklist on the dashboard.
+>
+> Phase 5 (Search Console and content):
 >
 > - Content briefs: analysis of the Google top 10 (length, headings, terms, questions, schema) and an outline written by Claude, with a template fallback; Markdown export.
 > - Google Search Console: OAuth connection, daily sync, clicks/impressions/CTR/position by query and page, cannibalization and traffic-estimate calibration.
@@ -79,10 +87,10 @@ pnpm db:migrate   # apply Postgres + ClickHouse migrations
 All configuration is environment-based; see [.env.example](.env.example) for every variable and its purpose. Highlights:
 
 - `KEYWORD_PROVIDER`, `SERP_PROVIDER`: `mock` (default) or `dataforseo` (needs `DATAFORSEO_LOGIN`/`DATAFORSEO_PASSWORD`; `DATAFORSEO_SANDBOX=true` uses the free sandbox). `DOMAIN_PROVIDER` (domain overview, organic keywords, competitors) works the same way. `BACKLINK_PROVIDER` uses the DataForSEO Backlinks API (check that it is enabled for your DataForSEO account).
-- `ANTHROPIC_API_KEY`: optional; enables Claude for classifying ambiguous search intent.
+- `ANTHROPIC_API_KEY`: optional; enables Claude for ambiguous search intent and content briefs.
 - `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`: enable "Continue with Google".
 - `CREDIT_COSTS_JSON`: override credit prices per operation.
-- `BILLING_ENABLED`: Stripe (Phase 6) stays off without keys.
+- `BILLING_ENABLED`: Stripe billing. Needs `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` and the Price IDs `STRIPE_PRICE_PRO` / `STRIPE_PRICE_AGENCY`. Point a Stripe webhook at `<APP_URL>/api/v1/billing/webhook`; locally use `stripe listen --forward-to localhost:3000/api/v1/billing/webhook`.
 - `SENTRY_DSN`: optional error reporting.
 
 ## Architecture

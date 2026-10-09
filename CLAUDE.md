@@ -6,7 +6,7 @@ Guidance for AI agents and developers working in this repository.
 
 **Kompas SEO** — a SaaS for SEO research "from keywords to competitor sites" for the EU market, with first-class Bulgarian (Cyrillic) support. The UI is in Bulgarian (default) and English. Code, comments and commits are in English.
 
-The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks (done) · 5. GSC and content (done) · 6. Monetization and polish.
+The full product spec lives with the project owner. It is built in phases: 0. Foundation (done) · 1. Keywords (done) · 2. Domains and competitors (done) · 3. Rank tracking (done) · 4. Backlinks (done) · 5. GSC and content (done) · 6. Monetization and polish (done).
 
 ## Architecture
 
@@ -99,6 +99,14 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 - Search Console: Google OAuth web flow (`access_type=offline`, `prompt=consent`); the state is single use (Redis, 10 min) and bound to the user. Refresh tokens are encrypted with `encryptSecret` and AAD `gsc:<projectId>`. `GSC_PROVIDER=mock` connects sample data. The worker syncs daily (90 days first, then the last 7, one day per request, 2-day lag) into ClickHouse `gsc_daily` (read with FINAL). Disconnect revokes the token and deletes the data.
 - Cannibalization (`seo-core/cannibalization.ts`) and calibration (Σ real clicks ÷ Σ estimated, from rank tracking or the domain keyword snapshot, whichever overlaps more) are computed from `gsc_daily`.
 - ClickHouse gotcha: an alias that equals a column name (`sum(clicks) AS clicks`) shadows it in the rest of the query; use distinct aliases.
+
+## Monetization and polish (Phase 6)
+
+- **Billing** (`apps/api/src/billing`): Stripe behind `BILLING_ENABLED`. Checkout (mode `subscription`) for Pro/Agency, the customer portal for changes and cancellation. Webhooks are the only source of plan state: the body is kept raw for `/api/v1/billing/webhook` (`express.raw` before `express.json` in `app.factory.ts`) and verified with `constructEvent`; event ids are deduped in Redis; subscriptions are always re-read from Stripe (events arrive out of order). Period dates come from `items.data[0].current_period_*`, the invoice's subscription from `parent.subscription_details`. Each paid invoice grants the plan's credits (idempotency key `plan_grant:stripe:<invoiceId>`); the worker's monthly grant skips orgs with a Stripe subscription.
+- **API keys** (`apps/api/src/api-keys`): `ks_` + 32 random bytes, only the SHA-256 hash is stored. `SessionGuard` accepts `Authorization: Bearer ks_…` for plans with `apiAccess`, rate limited per key and minute (`apiRatePerMinute`). A key is bound to its organization and acts as its creator with at most the key role (member/viewer). Keys cannot manage keys, export or delete data (`assertSession`).
+- **GDPR** (`apps/api/src/privacy`): export of the account and the organization (secrets such as refresh tokens and key hashes stripped), deletion of the account (blocked while the user is the only owner of a shared organization; organizations where they are alone are deleted with it) and of the organization (owner only, name confirmation). ClickHouse data goes through `privacy-store.ts` with `mutations_sync`.
+- **Reports** (`apps/api/src/reports`): `GET /reports/domain.pdf` (`report:read`) built with PDFKit from the same stored research (free when fresh). PDFKit's standard fonts have no Cyrillic, so DejaVu Sans (`dejavu-fonts-ttf`) is embedded. Footers are written with the bottom margin set to 0, otherwise PDFKit adds blank pages.
+- **Web**: settings tabs `billing`, `apiKeys`, `privacy` (`apps/web/src/app/[locale]/app/settings`), `reports/`, the dashboard checklist (`components/getting-started.tsx`, derived from real data, nothing stored). Downloads that can fail use `downloadFile` (`lib/account-api.ts`) so API errors become toasts.
 
 ## Conventions
 
