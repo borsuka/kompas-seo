@@ -1013,5 +1013,164 @@
       "manualPlaceholder": "spam-site.xyz\nhttps://example.com/spam-page",
       "addManual": "Add"
     }
+  },
+  "content": {
+    "title": "Content",
+    "description": "AI briefs from an analysis of the top-10 pages, and Google Search Console data",
+    "list": "Briefs",
+    "results": "{count, plural, one {# brief} other {# briefs}}",
+    "emptyTitle": "Create your first brief",
+    "emptyBody": "Enter a keyword: we analyze the pages in Google’s top 10 and prepare an outline, terms and questions for the article.",
+    "tabs": {
+      "label": "Content sections",
+      "briefs": "Briefs",
+      "gsc": "Search Console"
+    },
+    "status": {
+      "queued": "Queued",
+      "running": "Analyzing",
+      "ready": "Ready",
+      "failed": "Failed"
+    },
+    "source": {
+      "ai": "Written by AI",
+      "template": "Automatic template"
+    },
+    "columns": {
+      "keyword": "Keyword",
+      "market": "Market",
+      "status": "Status",
+      "source": "Source",
+      "created": "Created"
+    },
+    "form": {
+      "placeholder": "Keyword for the brief, e.g. teeth whitening",
+      "keyword": "Keyword",
+      "submit": "Create brief",
+      "cost": "20 credits: SERP, top-10 analysis and AI outline"
+    },
+    "detail": {
+      "description": "Content brief",
+      "back": "All briefs",
+      "copy": "Copy",
+      "copied": "Brief copied as Markdown",
+      "download": "Download .md",
+      "delete": "Delete brief",
+      "confirmDelete": "Delete this brief?",
+      "working": "Analyzing the top-10 pages…",
+      "progress": "{progress}%",
+      "workingHint": "usually takes less than a minute",
+      "failed": "The brief could not be created",
+      "basics": "Basics",
+      "titles": "Title tag options",
+      "meta": "Meta description",
+      "intent": "Intent",
+      "length": "Length",
+      "words": "{min}–{max} words",
+      "outline": "Outline",
+      "questions": "Questions to answer",
+      "top10": "What the top 10 do",
+      "top10Hint": "{count, plural, one {# page analyzed} other {# pages analyzed}}",
+      "stats": {
+        "words": "Length: median {median} words (between {p25} and {p75})",
+        "headings": "Subheadings: ~{h2} H2 and ~{h3} H3",
+        "keywordInTitle": "The keyword is in the title for {share}",
+        "schema": "Structured data: {types}"
+      },
+      "terms": "Key terms",
+      "termsHint": "The percentage shows how many of the top-10 pages use the term",
+      "notes": "Recommendations",
+      "pages": "Analyzed pages",
+      "pageWords": "{count, plural, one {# word} other {# words}}",
+      "skipped": {
+        "robots": "Skipped: disallowed by robots.txt",
+        "blocked": "Skipped: address not allowed",
+        "http_error": "Skipped: server error",
+        "noindex": "Skipped: noindex",
+        "timeout": "Skipped: timed out",
+        "too_large": "Skipped: page too large",
+        "too_many_redirects": "Skipped: too many redirects",
+        "unsupported_content": "Skipped: not HTML",
+        "network": "Skipped: network error"
+      },
+      "h1": "H1"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "description": "Real clicks and impressions for {domain}",
+      "noProject": "Create a project to connect Search Console",
+      "createProject": "New project",
+      "connected": "Search Console connected. Loading data…",
+      "sync": "Sync",
+      "disconnect": "Disconnect",
+      "confirmDisconnect": "Disconnect? The imported data will be deleted.",
+      "reconnectTitle": "Search Console access has expired",
+      "connectTitle": "Connect Google Search Console",
+      "connectBody": "See real clicks and positions, find cannibalization and calibrate our traffic estimates. Access is read-only.",
+      "connectMockBody": "Demo mode: we connect sample Search Console data, no Google account needed (GSC_PROVIDER=mock).",
+      "connect": "Connect Search Console",
+      "viewerHint": "Only members who can edit the project can connect Search Console.",
+      "chooseSite": "Choose a property",
+      "chooseSiteBody": "We could not match a property to {domain} automatically. Choose which site to use.",
+      "noSites": "This Google account has no verified Search Console sites.",
+      "reports": "Reports",
+      "tabs": {
+        "performance": "Performance",
+        "cannibalization": "Cannibalization",
+        "calibration": "Calibration"
+      },
+      "period": "Period",
+      "days": "{count, plural, one {# day} other {# days}}",
+      "site": "Property: {site}",
+      "lastSync": "synced {date}",
+      "dataUntil": "data until {date}",
+      "columns": {
+        "query": "Query",
+        "page": "Page",
+        "clicks": "Clicks",
+        "impressions": "Impressions",
+        "ctr": "CTR",
+        "position": "Average position",
+        "pages": "Pages",
+        "volume": "Volume",
+        "estimated": "Our estimate (clicks/mo)",
+        "actual": "Actual (clicks/mo)"
+      },
+      "vsPrevious": "vs. the previous period",
+      "trend": "Clicks and impressions",
+      "groupBy": "Group by",
+      "by": {
+        "query": "By query",
+        "page": "By page"
+      },
+      "search": "Search",
+      "results": "{count, plural, one {# row} other {# rows}}",
+      "noData": "No data yet",
+      "noDataBody": "The first sync loads the last 90 days. Search Console data arrives with a 2–3 day delay.",
+      "severity": {
+        "high": "Strong cannibalization",
+        "medium": "Possible cannibalization"
+      },
+      "pageShare": "{share} of impressions · position {position}",
+      "cannibalHint": "Queries where several of your pages split the impressions. Merge the content or make the main page clear (internal links, canonical).",
+      "noCannibal": "No cannibalization in the selected period",
+      "factor": "Calibration factor",
+      "calibrationNone": "Not enough data to compare: track rankings or analyze the domain so we have estimates.",
+      "calibrationHint": "Compared over {count, plural, one {# query} other {# queries}} ({source}).",
+      "calibrationSource": {
+        "rank_tracking": "tracked rankings",
+        "domain_keywords": "domain organic keywords"
+      },
+      "calibrationSmall": "The sample is small: the factor is indicative.",
+      "outcome": {
+        "connected": "Search Console connected",
+        "choose_site": "Connected. Choose a property.",
+        "denied": "Access was not granted",
+        "no_refresh_token": "Google returned no long-lived access. Remove the app from your Google account and try again.",
+        "not_configured": "Google OAuth is not configured",
+        "invalid_state": "The link expired. Please try again.",
+        "failed": "Connecting failed. Please try again."
+      }
+    }
   }
 }

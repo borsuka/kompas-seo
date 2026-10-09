@@ -8,7 +8,7 @@ try {
   // Optional: CI and production pass variables directly.
 }
 
-const apiUrl = process.env.API_INTERNAL_URL ?? 'http://localhost:4000';
+const apiUrl = process.env.API_INTERNAL_URL ?? 'http://localhost:14000';
 
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },

@@ -1013,5 +1013,164 @@
       "manualPlaceholder": "spam-site.xyz\nhttps://example.com/spam-page",
       "addManual": "Добави"
     }
+  },
+  "content": {
+    "title": "Съдържание",
+    "description": "AI брифове от анализ на страниците в топ 10 и данни от Google Search Console",
+    "list": "Брифове",
+    "results": "{count, plural, one {# бриф} other {# брифа}}",
+    "emptyTitle": "Създайте първия си бриф",
+    "emptyBody": "Въведете ключова дума: анализираме страниците в топ 10 на Google и подготвяме структура, термини и въпроси за текста.",
+    "tabs": {
+      "label": "Раздели на съдържанието",
+      "briefs": "Брифове",
+      "gsc": "Search Console"
+    },
+    "status": {
+      "queued": "В опашката",
+      "running": "Анализира се",
+      "ready": "Готов",
+      "failed": "Неуспешен"
+    },
+    "source": {
+      "ai": "Написан от AI",
+      "template": "Автоматичен шаблон"
+    },
+    "columns": {
+      "keyword": "Ключова дума",
+      "market": "Пазар",
+      "status": "Статус",
+      "source": "Източник",
+      "created": "Създаден"
+    },
+    "form": {
+      "placeholder": "Ключова дума за бриф, напр. избелване на зъби",
+      "keyword": "Ключова дума",
+      "submit": "Създай бриф",
+      "cost": "20 кредита: SERP, анализ на топ 10 и AI структура"
+    },
+    "detail": {
+      "description": "Бриф за съдържание",
+      "back": "Всички брифове",
+      "copy": "Копирай",
+      "copied": "Брифът е копиран като Markdown",
+      "download": "Свали .md",
+      "delete": "Изтрий брифа",
+      "confirmDelete": "Да изтрием ли този бриф?",
+      "working": "Анализираме страниците в топ 10…",
+      "progress": "{progress}%",
+      "workingHint": "обикновено отнема под минута",
+      "failed": "Брифът не можа да бъде създаден",
+      "basics": "Основни елементи",
+      "titles": "Предложения за title",
+      "meta": "Мета описание",
+      "intent": "Намерение",
+      "length": "Дължина",
+      "words": "{min}–{max} думи",
+      "outline": "Структура на текста",
+      "questions": "Въпроси, на които да отговорите",
+      "top10": "Какво правят топ 10",
+      "top10Hint": "{count, plural, one {Анализирана # страница} other {Анализирани # страници}}",
+      "stats": {
+        "words": "Дължина: медиана {median} думи (между {p25} и {p75})",
+        "headings": "Подзаглавия: ~{h2} H2 и ~{h3} H3",
+        "keywordInTitle": "Ключовата дума е в заглавието при {share}",
+        "schema": "Структурирани данни: {types}"
+      },
+      "terms": "Ключови термини",
+      "termsHint": "Процентът показва при колко от страниците в топ 10 се среща терминът",
+      "notes": "Препоръки",
+      "pages": "Анализирани страници",
+      "pageWords": "{count, plural, one {# дума} other {# думи}}",
+      "skipped": {
+        "robots": "Пропусната: забранена от robots.txt",
+        "blocked": "Пропусната: недостъпен адрес",
+        "http_error": "Пропусната: грешка от сървъра",
+        "noindex": "Пропусната: noindex",
+        "timeout": "Пропусната: изтече времето",
+        "too_large": "Пропусната: твърде голяма страница",
+        "too_many_redirects": "Пропусната: твърде много пренасочвания",
+        "unsupported_content": "Пропусната: не е HTML",
+        "network": "Пропусната: мрежова грешка"
+      },
+      "h1": "H1"
+    },
+    "gsc": {
+      "title": "Google Search Console",
+      "description": "Реални кликове и импресии за {domain}",
+      "noProject": "Създайте проект, за да свържете Search Console",
+      "createProject": "Нов проект",
+      "connected": "Search Console е свързан. Данните се зареждат…",
+      "sync": "Синхронизирай",
+      "disconnect": "Прекъсни връзката",
+      "confirmDisconnect": "Да прекъснем ли връзката? Импортираните данни ще бъдат изтрити.",
+      "reconnectTitle": "Достъпът до Search Console е изтекъл",
+      "connectTitle": "Свържете Google Search Console",
+      "connectBody": "Вижте реалните кликове и позиции, открийте канибализация и калибрирайте оценките ни за трафик. Достъпът е само за четене.",
+      "connectMockBody": "Демо режим: свързваме примерни данни за Search Console, без Google акаунт (GSC_PROVIDER=mock).",
+      "connect": "Свържи Search Console",
+      "viewerHint": "Само членове с права за редакция могат да свързват Search Console.",
+      "chooseSite": "Изберете property",
+      "chooseSiteBody": "Не намерихме автоматично property за {domain}. Изберете кой сайт да използваме.",
+      "noSites": "Този Google акаунт няма потвърдени сайтове в Search Console.",
+      "reports": "Отчети",
+      "tabs": {
+        "performance": "Представяне",
+        "cannibalization": "Канибализация",
+        "calibration": "Калибриране"
+      },
+      "period": "Период",
+      "days": "{count, plural, one {# ден} other {# дни}}",
+      "site": "Property: {site}",
+      "lastSync": "синхронизирано {date}",
+      "dataUntil": "данни до {date}",
+      "columns": {
+        "query": "Заявка",
+        "page": "Страница",
+        "clicks": "Кликове",
+        "impressions": "Импресии",
+        "ctr": "CTR",
+        "position": "Средна позиция",
+        "pages": "Страници",
+        "volume": "Обем",
+        "estimated": "Наша оценка (кликове/мес.)",
+        "actual": "Реални (кликове/мес.)"
+      },
+      "vsPrevious": "спрямо предходния период",
+      "trend": "Кликове и импресии",
+      "groupBy": "Групиране",
+      "by": {
+        "query": "По заявки",
+        "page": "По страници"
+      },
+      "search": "Търсене",
+      "results": "{count, plural, one {# ред} other {# реда}}",
+      "noData": "Още няма данни",
+      "noDataBody": "Първата синхронизация зарежда последните 90 дни. Search Console показва данни с 2–3 дни закъснение.",
+      "severity": {
+        "high": "Силна канибализация",
+        "medium": "Възможна канибализация"
+      },
+      "pageShare": "{share} от импресиите · позиция {position}",
+      "cannibalHint": "Заявки, за които няколко ваши страници си поделят импресиите. Обединете съдържанието или изяснете коя страница е основната (вътрешни линкове, canonical).",
+      "noCannibal": "Няма канибализация за избрания период",
+      "factor": "Коефициент на калибриране",
+      "calibrationNone": "Няма достатъчно данни за сравнение: следете позиции или анализирайте домейна, за да имаме оценки.",
+      "calibrationHint": "Сравнение по {count, plural, one {# заявка} other {# заявки}} ({source}).",
+      "calibrationSource": {
+        "rank_tracking": "проследени позиции",
+        "domain_keywords": "органични думи на домейна"
+      },
+      "calibrationSmall": "Извадката е малка: коефициентът е ориентировъчен.",
+      "outcome": {
+        "connected": "Search Console е свързан",
+        "choose_site": "Свързано. Изберете property.",
+        "denied": "Достъпът не беше разрешен",
+        "no_refresh_token": "Google не върна дълготраен достъп. Премахнете приложението от профила си в Google и опитайте отново.",
+        "not_configured": "Google OAuth не е конфигуриран",
+        "invalid_state": "Връзката изтече. Опитайте отново.",
+        "failed": "Свързването не успя. Опитайте отново."
+      }
+    }
   }
 }

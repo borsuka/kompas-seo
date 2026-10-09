@@ -26,7 +26,7 @@ export default defineConfig({
   webServer: [
     {
       command: 'pnpm --filter @seo/api start',
-      url: 'http://localhost:4000/health/live',
+      url: 'http://localhost:14000/health/live',
       reuseExistingServer: true,
       timeout: 120_000,
     },
