@@ -14,3 +14,4 @@ export * from './schemas/domains.js';
 export * from './schemas/rankings.js';
 export * from './schemas/backlinks.js';
 export * from './schemas/content.js';
+export * from './schemas/gsc.js';

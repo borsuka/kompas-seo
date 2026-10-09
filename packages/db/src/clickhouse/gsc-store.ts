@@ -168,3 +168,11 @@ export async function gscLatestDate(
     .then((r) => r.json<{ day: string; n: string }>());
   return row && num(row.n) > 0 ? row.day : null;
 }
+
+/** Removes all Search Console data of a project (disconnect / GDPR). */
+export async function deleteGscProject(ch: ClickHouseClient, projectId: string) {
+  await ch.command({
+    query: 'ALTER TABLE gsc_daily DELETE WHERE project_id = {project:UUID}',
+    query_params: { project: projectId },
+  });
+}

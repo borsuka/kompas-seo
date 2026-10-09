@@ -54,6 +54,10 @@ describe('Tenant isolation between organizations', () => {
       .send({ keywords: ['x'] })
       .expect(404);
     await b.agent.get(`/api/v1/projects/${project.body.id}/rankings/alerts`).expect(404);
+    // Search Console
+    await b.agent.get(`/api/v1/projects/${project.body.id}/gsc`).expect(404);
+    await b.agent.post(`/api/v1/projects/${project.body.id}/gsc/connect`).expect(404);
+    await b.agent.get(`/api/v1/projects/${project.body.id}/gsc/performance`).expect(404);
     // Backlink toxicity and the disavow list
     await b.agent.get(`/api/v1/projects/${project.body.id}/backlinks/toxic`).expect(404);
     await b.agent.get(`/api/v1/projects/${project.body.id}/disavow`).expect(404);

@@ -27,7 +27,7 @@ export async function gscAccessToken(deps: WorkerDeps, conn: Connection, domain:
   if (conn.provider === 'mock') return mockAccessToken(domain);
   if (!deps.gsc.oauth || !conn.refreshTokenEnc || !deps.encryptionKey)
     throw new Error('Google Search Console is not configured');
-  const cacheKey = `gsc:at:${conn.id}`;
+  const cacheKey = `gsc:at:${conn.projectId}`;
   const cached = await deps.redis.get(cacheKey);
   if (cached) return cached;
   const refresh = decryptSecret(
