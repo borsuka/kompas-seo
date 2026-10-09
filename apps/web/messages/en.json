@@ -217,10 +217,6 @@
     "creditsOf": "of {total} this month",
     "competitorsCard": "Competitors",
     "competitorsCount": "{count, plural, =0 {None added} one {# competitor} other {# competitors}}",
-    "nextSteps": "Next steps",
-    "stepKeywords": "Research keywords for your niche",
-    "stepCompetitors": "Add competitors to compare keywords and links",
-    "stepTeam": "Invite your colleagues",
     "noProjectTitle": "No project yet",
     "noProjectBody": "Add your domain to see an overview, competitors and missed opportunities.",
     "systemCheck": "Background jobs check",
@@ -229,41 +225,22 @@
     "jobRunning": "Running… {progress}%",
     "jobDone": "Done",
     "jobFailed": "The job failed: {error}",
-    "jobQueued": "Queued…"
-  },
-  "sections": {
-    "keywords": {
-      "title": "Keywords",
-      "body": "Ideas, volume, difficulty (KD), intent and SERP for every keyword, with lists and clustering.",
-      "phase": "Coming in Phase 1"
-    },
-    "rankings": {
-      "title": "Rankings",
-      "body": "Daily tracking by device and location, history, visibility and share of voice.",
-      "phase": "Coming in Phase 3"
-    },
-    "competitors": {
-      "title": "Competitors",
-      "body": "Domain overview, automatic competitor discovery, keyword gap and content gap.",
-      "phase": "Coming in Phase 2"
-    },
-    "backlinks": {
-      "title": "Backlinks",
-      "body": "Referring domains, new and lost links, broken links, link gap and disavow.",
-      "phase": "Coming in Phase 4"
-    },
-    "content": {
-      "title": "Content",
-      "body": "Top 10 page analysis, AI briefs and cannibalization detection.",
-      "phase": "Coming in Phase 5"
-    },
-    "reports": {
-      "title": "Reports",
-      "body": "PDF domain reports and CSV/XLSX export of every table.",
-      "phase": "Coming in Phase 6"
-    },
-    "searchFor": "You searched for: {query}",
-    "setUpProject": "Set up the project"
+    "jobQueued": "Queued…",
+    "gettingStarted": {
+      "title": "Getting started",
+      "progress": "{done} of {total} steps done",
+      "allDone": "All set: your project is fully configured.",
+      "stepDone": "done",
+      "stepTodo": "to do",
+      "steps": {
+        "project": "Add your website as a project",
+        "keywords": "Research keywords and save them to a list",
+        "competitors": "Add or discover competitors",
+        "rankings": "Track rankings for your main keywords",
+        "gsc": "Connect Google Search Console",
+        "team": "Invite a colleague"
+      }
+    }
   },
   "settings": {
     "title": "Settings",
@@ -271,13 +248,16 @@
       "project": "Project",
       "members": "Members",
       "credits": "Credits",
-      "organization": "Organization"
+      "organization": "Organization",
+      "billing": "Plan & billing",
+      "apiKeys": "API keys",
+      "privacy": "Privacy"
     },
     "project": {
       "title": "Project settings",
       "description": "Domain, country and default language for all reports.",
       "competitorsTitle": "Competitors",
-      "competitorsDescription": "Add up to 10 competitor domains. Automatic discovery arrives in Phase 2.",
+      "competitorsDescription": "Add up to 10 competitor domains, or discover them automatically under Competitors.",
       "competitorPlaceholder": "competitor.com",
       "noCompetitors": "No competitors yet. Add the first one to compare keywords and links.",
       "sourceManual": "manual",
@@ -323,6 +303,81 @@
       "title": "Organization",
       "description": "Create a separate organization for another client or team.",
       "create": "Create organization"
+    },
+    "apiKeys": {
+      "title": "API keys",
+      "description": "Access the REST API from scripts and integrations. Keys belong to the organization.",
+      "noAccess": "You do not have permission to view API keys.",
+      "planRequired": "The public API is included in the Agency plan.",
+      "seePlans": "See plans",
+      "name": "Name",
+      "namePlaceholder": "e.g. Looker Studio",
+      "role": "Access",
+      "roleHelp": "Read-only keys can read every report; member keys can also run research and spend credits. A key never has more rights than the person who created it.",
+      "create": "Create key",
+      "createdBy": "Created by",
+      "lastUsed": "Last used",
+      "neverUsed": "never",
+      "actions": "Actions",
+      "revoke": "Revoke {name}",
+      "revokeConfirm": "Revoke the key \"{name}\"? Integrations using it will stop working.",
+      "revoked": "Key revoked",
+      "emptyTitle": "No API keys",
+      "empty": "Create a key to use the API from your own tools.",
+      "createdTitle": "Copy your new key",
+      "createdBody": "This is the only time the key is shown. Store it somewhere safe.",
+      "key": "API key",
+      "copy": "Copy",
+      "copied": "Copied",
+      "done": "I saved it",
+      "usageTitle": "Using the API",
+      "usage": "Send the key as a bearer token. Limits per minute depend on the plan.",
+      "docs": "The full reference is in the OpenAPI documentation at /docs on the API server."
+    },
+    "billing": {
+      "current": "Current plan",
+      "status": {
+        "active": "active",
+        "trialing": "trial",
+        "past_due": "payment overdue",
+        "canceled": "cancelled",
+        "incomplete": "awaiting payment"
+      },
+      "renewsOn": "Renews on {date}.",
+      "endsOn": "Ends on {date} and will not renew.",
+      "freeNote": "The free plan has no end date.",
+      "portal": "Manage billing",
+      "yourPlan": "Your plan",
+      "credits": "{n} credits per month",
+      "projects": "Up to {n} projects",
+      "members": "Up to {n} members",
+      "tracked": "{n} tracked keywords",
+      "api": "Public API",
+      "notIncluded": "not included",
+      "upgrade": "Upgrade",
+      "change": "Change plan",
+      "success": "Payment received. Your plan updates within a minute.",
+      "cancelled": "Checkout was cancelled. Nothing was charged.",
+      "disabled": "Online payments are not enabled on this installation. Contact us to change your plan.",
+      "ownerOnly": "Only the organization owner can change the plan.",
+      "stripeNote": "Payments are processed by Stripe. Invoices, payment methods and cancellation are in the billing portal."
+    },
+    "privacy": {
+      "exportTitle": "Export your data",
+      "exportBody": "Download a JSON copy of the personal data we store about you or of the whole organization (GDPR, Articles 15 and 20).",
+      "exportAccount": "Export my account",
+      "exportOrganization": "Export organization",
+      "deleteOrgTitle": "Delete organization",
+      "deleteOrgBody": "Deletes \"{name}\" with all projects, research, rankings, backlinks, content briefs and Search Console data. This cannot be undone.",
+      "typeName": "Type \"{name}\" to confirm",
+      "deleteOrg": "Delete organization",
+      "deleteAccountTitle": "Delete account",
+      "deleteAccountBody": "Deletes your account and personal data. Organizations where you are the only member are deleted with it.",
+      "deleteAccountStart": "Delete my account…",
+      "mustTransfer": "First make someone else the owner of, or delete: {names}.",
+      "deletedWithAccount": "These organizations will be deleted too: {names}.",
+      "typeEmail": "Type your email {email} to confirm",
+      "deleteAccount": "Delete my account permanently"
     }
   },
   "metrics": {
@@ -1172,5 +1227,31 @@
         "failed": "Connecting failed. Please try again."
       }
     }
+  },
+  "reports": {
+    "title": "Reports",
+    "description": "PDF reports to share with clients and colleagues.",
+    "domainReport": "Domain report",
+    "domainReportBody": "Organic visibility, top keywords and pages, and backlinks of any domain. For your project it also includes rankings and Search Console.",
+    "domain": "Domain",
+    "domainHint": "Leave empty for the current project.",
+    "language": "Report language",
+    "languages": {
+      "bg": "Bulgarian",
+      "en": "English"
+    },
+    "download": "Download PDF",
+    "generating": "Generating…",
+    "ready": "The report is ready",
+    "creditsNote": "Data analysed in the last 7 days is reused for free; otherwise it is fetched and costs credits.",
+    "viewerNote": "With view-only access, reports use the data already analysed.",
+    "contents": "Contents",
+    "sections": {
+      "organic": "Organic traffic, keywords and top pages",
+      "backlinks": "Backlinks and top referring domains",
+      "rankings": "Rank tracking: visibility and biggest changes",
+      "gsc": "Search Console: clicks, impressions, top queries"
+    },
+    "projectOnly": "Rankings and Search Console are included for {domain}."
   }
 }

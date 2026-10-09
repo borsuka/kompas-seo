@@ -1,10 +1,10 @@
 import { Suspense } from 'react';
-import { SectionPlaceholder } from '@/components/section-placeholder';
+import { ReportsPage } from './reports-page';
 
 export default function Page() {
   return (
     <Suspense>
-      <SectionPlaceholder section="reports" />
+      <ReportsPage />
     </Suspense>
   );
 }

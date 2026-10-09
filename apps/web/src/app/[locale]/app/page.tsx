@@ -1,5 +1,5 @@
 'use client';
-import { CheckCircle2, Coins, FolderGit2, Search, Target, Users } from 'lucide-react';
+import { CheckCircle2, Coins, FolderGit2, Target } from 'lucide-react';
 import { useFormatter, useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { findLocation } from '@seo/shared';
@@ -7,9 +7,9 @@ import { Badge } from '@seo/ui/badge';
 import { Button } from '@seo/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@seo/ui/card';
 import { useCurrentProject } from '@/components/app-shell/project-context';
+import { GettingStarted } from '@/components/getting-started';
 import { MetricLabel } from '@/components/metric-tooltip';
 import { PageHeader } from '@/components/page-header';
-import { Link } from '@/i18n/navigation';
 import { useCan, useCompetitors, useCredits, useMe, useStartDemoJob } from '@/lib/queries';
 import { useJobProgress } from '@/lib/use-job-progress';
 import { useErrorMessage } from '@/lib/use-error-message';
@@ -79,53 +79,10 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              <h2>{t('dashboard.nextSteps')}</h2>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              <NextStep href="/app/keywords" icon={Search} label={t('dashboard.stepKeywords')} />
-              <NextStep
-                href="/app/settings?tab=project"
-                icon={Target}
-                label={t('dashboard.stepCompetitors')}
-              />
-              <NextStep
-                href="/app/settings?tab=members"
-                icon={Users}
-                label={t('dashboard.stepTeam')}
-              />
-            </ul>
-          </CardContent>
-        </Card>
+        {current && <GettingStarted projectId={current.id} />}
         <SystemCheckCard />
       </div>
     </>
-  );
-}
-
-function NextStep({
-  href,
-  icon: Icon,
-  label,
-}: {
-  href: string;
-  icon: typeof Search;
-  label: string;
-}) {
-  return (
-    <li>
-      <Link
-        href={href}
-        className="border-border hover:bg-muted focus-visible:ring-ring flex items-center gap-3 rounded-md border px-3 py-2.5 text-sm focus-visible:ring-2 focus-visible:outline-none"
-      >
-        <Icon className="text-primary size-4" aria-hidden />
-        {label}
-      </Link>
-    </li>
   );
 }
 
