@@ -53,9 +53,12 @@ export async function createApp(): Promise<INestApplication> {
 
   const config = new DocumentBuilder()
     .setTitle('Kompas SEO API')
-    .setDescription('REST API. Authentication: Better Auth session cookie (`/api/auth/*`).')
+    .setDescription(
+      'REST API. Authentication: Better Auth session cookie (`/api/auth/*`) or, on plans with API access, `Authorization: Bearer ks_…` (API key from Settings → API).',
+    )
     .setVersion('0.1.0')
     .addCookieAuth('better-auth.session_token')
+    .addBearerAuth({ type: 'http', scheme: 'bearer', description: 'API key (ks_…)' })
     .addGlobalParameters({
       name: 'x-org-id',
       in: 'header',

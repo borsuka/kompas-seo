@@ -22,11 +22,19 @@ export interface OrgContext {
   memberId: string;
 }
 
+/** Set when the request is authenticated with a public API key instead of a session. */
+export interface ApiKeyContext {
+  id: string;
+  organizationId: string;
+  role: 'member' | 'viewer';
+}
+
 /** Express request enriched by our guards. */
 export interface AppRequest extends Request {
   user?: AuthUser;
   session?: AuthSession;
   org?: OrgContext;
+  apiKey?: ApiKeyContext;
 }
 
 export const IS_PUBLIC = 'auth:isPublic';

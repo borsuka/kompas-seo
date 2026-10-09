@@ -178,3 +178,28 @@ export const auditLog = pgTable(
   },
   (t) => [index('audit_log_org_created_idx').on(t.organizationId, t.createdAt)],
 );
+
+/** Public API keys. Only a SHA-256 hash is stored; the key is shown once on creation. */
+export const apiKeys = pgTable(
+  'api_keys',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    organizationId: orgId(),
+    name: text('name').notNull(),
+    /** First characters of the key, shown in the UI to recognize it. */
+    prefix: text('prefix').notNull(),
+    keyHash: text('key_hash').notNull(),
+    /** `member` or `viewer`: the key never has more rights than its creator. */
+    role: text('role').notNull(),
+    createdBy: text('created_by')
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    lastUsedAt: timestamp('last_used_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex('api_keys_hash_uidx').on(t.keyHash),
+    index('api_keys_org_idx').on(t.organizationId),
+  ],
+);
