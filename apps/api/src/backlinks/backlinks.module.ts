@@ -7,5 +7,6 @@ import { BacklinksService } from './backlinks.service.js';
   imports: [ProjectsModule],
   controllers: [BacklinksController],
   providers: [BacklinksService],
+  exports: [BacklinksService],
 })
 export class BacklinksModule {}

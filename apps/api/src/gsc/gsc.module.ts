@@ -8,5 +8,6 @@ import { GscService } from './gsc.service.js';
   imports: [ProjectsModule, JobsModule],
   controllers: [GscController],
   providers: [GscService],
+  exports: [GscService],
 })
 export class GscModule {}

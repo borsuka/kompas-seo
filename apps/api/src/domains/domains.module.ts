@@ -7,5 +7,6 @@ import { DomainsService } from './domains.service.js';
   imports: [ProjectsModule],
   controllers: [DomainsController],
   providers: [DomainsService],
+  exports: [DomainsService],
 })
 export class DomainsModule {}

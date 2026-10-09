@@ -9,5 +9,6 @@ import { RankingsService } from './rankings.service.js';
   imports: [ProjectsModule, KeywordsModule, JobsModule],
   controllers: [RankingsController],
   providers: [RankingsService],
+  exports: [RankingsService],
 })
 export class RankingsModule {}
