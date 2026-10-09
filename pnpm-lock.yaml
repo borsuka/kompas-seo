@@ -205,9 +205,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@anthropic-ai/sdk':
-        specifier: ^0.131.0
-        version: 0.131.0(zod@4.6.5)
       '@nestjs/common':
         specifier: ^12.1.2
         version: 12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1)
@@ -226,12 +223,18 @@ importers:
       '@sentry/nestjs':
         specifier: ^11.4.0
         version: 11.4.0(@babel/core@7.29.7(supports-color@8.1.1))(@nestjs/common@12.1.2(reflect-metadata@0.2.2)(rxjs@7.8.2)(supports-color@8.1.1))(@nestjs/core@12.1.2)
+      '@seo/crawler':
+        specifier: workspace:*
+        version: link:../../packages/crawler
       '@seo/data-providers':
         specifier: workspace:*
         version: link:../../packages/data-providers
       '@seo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@seo/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@seo/seo-core':
         specifier: workspace:*
         version: link:../../packages/seo-core
@@ -390,12 +393,18 @@ importers:
 
   apps/worker:
     dependencies:
+      '@seo/crawler':
+        specifier: workspace:*
+        version: link:../../packages/crawler
       '@seo/data-providers':
         specifier: workspace:*
         version: link:../../packages/data-providers
       '@seo/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@seo/llm':
+        specifier: workspace:*
+        version: link:../../packages/llm
       '@seo/seo-core':
         specifier: workspace:*
         version: link:../../packages/seo-core
@@ -480,6 +489,22 @@ importers:
       drizzle-kit:
         specifier: ^0.31.11
         version: 0.31.11
+
+  packages/llm:
+    dependencies:
+      '@anthropic-ai/sdk':
+        specifier: ^0.131.0
+        version: 0.131.0(zod@4.6.5)
+      '@seo/shared':
+        specifier: workspace:*
+        version: link:../shared
+      zod:
+        specifier: ^4.6.5
+        version: 4.6.5
+    devDependencies:
+      '@seo/config':
+        specifier: workspace:*
+        version: link:../config
 
   packages/seo-core:
     dependencies:

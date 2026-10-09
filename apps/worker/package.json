@@ -12,8 +12,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@seo/crawler": "workspace:*",
     "@seo/data-providers": "workspace:*",
     "@seo/db": "workspace:*",
+    "@seo/llm": "workspace:*",
     "@seo/seo-core": "workspace:*",
     "@seo/shared": "workspace:*",
     "bullmq": "^6.3.11",

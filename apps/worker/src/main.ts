@@ -1,7 +1,16 @@
 import { Queue, Worker } from 'bullmq';
 import { Redis } from 'ioredis';
 import { pino } from 'pino';
-import { ClickHouseUsageSink, createProviders, RedisCacheStore } from '@seo/data-providers';
+import { Crawler, type RobotsCache } from '@seo/crawler';
+import {
+  ClickHouseUsageSink,
+  createProviders,
+  GoogleGscClient,
+  GoogleOAuth,
+  MockGscClient,
+  RedisCacheStore,
+} from '@seo/data-providers';
+import { AnthropicLLMProvider, DisabledLLMProvider } from '@seo/llm';
 import { createDb, insertJob } from '@seo/db';
 import { clickHouseConfigFromEnv, createClickHouse } from '@seo/db/clickhouse';
 import {
@@ -47,6 +56,14 @@ const queues = Object.fromEntries(
   (Object.values(QUEUES) as QueueName[]).map((q) => [q, new Queue(q, { connection: redis })]),
 ) as Record<QueueName, Queue>;
 
+/** robots.txt per origin, shared by all worker processes for a day. */
+const robotsCache: RobotsCache = {
+  get: (origin) => redis.get(`robots:${origin}`),
+  set: async (origin, value, ttlSec) => {
+    await redis.set(`robots:${origin}`, value, 'EX', ttlSec);
+  },
+};
+
 const deps: WorkerDeps = {
   db,
   redis,
@@ -56,6 +73,24 @@ const deps: WorkerDeps = {
   mailer: createMailer(env),
   appUrl: env.APP_URL,
   creditCosts: resolveCreditCosts(env.CREDIT_COSTS_JSON),
+  llm:
+    env.ANTHROPIC_API_KEY && env.NODE_ENV !== 'test'
+      ? new AnthropicLLMProvider(env.ANTHROPIC_API_KEY, env.ANTHROPIC_MODEL)
+      : new DisabledLLMProvider(),
+  crawler: new Crawler(robotsCache),
+  gsc: {
+    google: new GoogleGscClient(),
+    mock: new MockGscClient(),
+    oauth:
+      env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+        ? new GoogleOAuth({
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+            redirectUri: `${env.APP_URL}/api/v1/integrations/gsc/callback`,
+          })
+        : null,
+  },
+  encryptionKey: env.ENCRYPTION_KEY,
   async enqueue(type, input, opts) {
     const queue = queues[JOB_QUEUE[type]];
     if (opts.dedupeKey) {
@@ -78,7 +113,13 @@ const deps: WorkerDeps = {
 };
 
 /** Concurrency per queue: CPU-light I/O bound jobs can run in parallel. */
-const CONCURRENCY: Record<QueueName, number> = { system: 5, credits: 1, keywords: 3, rankings: 2 };
+const CONCURRENCY: Record<QueueName, number> = {
+  system: 5,
+  credits: 1,
+  keywords: 3,
+  rankings: 2,
+  content: 2,
+};
 
 const workers = (Object.values(QUEUES) as QueueName[]).map((queueName) => {
   const worker = new Worker(
@@ -106,6 +147,12 @@ await creditsQueue.upsertJobScheduler(
     data: {},
     opts: { attempts: 3, backoff: { type: 'exponential', delay: 60_000 } },
   },
+);
+// Search Console: daily sync of every connected property (after Google's 2–3 day lag).
+await queues[QUEUES.content].upsertJobScheduler(
+  'gsc.schedule',
+  { pattern: '30 6 * * *', tz: 'UTC' },
+  { name: 'gsc.schedule', data: {}, opts: { attempts: 2 } },
 );
 // Rank tracking: every hour, projects whose keywords are due get a daily check.
 await queues[QUEUES.rankings].upsertJobScheduler(

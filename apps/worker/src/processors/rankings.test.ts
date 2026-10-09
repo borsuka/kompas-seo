@@ -1,71 +1,29 @@
 import { randomUUID } from 'node:crypto';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MockProvider } from '@seo/data-providers';
-import {
-  applyCreditEntry,
-  createDb,
-  eq,
-  getCreditBalance,
-  runMigrations,
-  schema,
-  sql,
-  type Database,
-} from '@seo/db';
-import {
-  clickHouseConfigFromEnv,
-  createClickHouse,
-  insertRankChecks,
-  rankHistory,
-  type ClickHouseClient,
-} from '@seo/db/clickhouse';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { applyCreditEntry, eq, getCreditBalance, schema, type Database } from '@seo/db';
+import { insertRankChecks, rankHistory, type ClickHouseClient } from '@seo/db/clickhouse';
 import { truncateAll } from '@seo/db/testing';
-import { DEFAULT_CREDIT_COSTS, type RankCheckJobInput } from '@seo/shared';
-import { clickhouseEnvSchema, loadRootEnv, parseEnv } from '@seo/shared/server';
-import type { EmailContent } from '../mailer.js';
-import type { JobContext, WorkerDeps } from '../runtime.js';
+import type { RankCheckJobInput } from '@seo/shared';
+import { makeContext, setupTestDatabases, type TestEffects } from '../testing.js';
 import { checkRankings, scheduleRankChecks } from './rankings.js';
 
-// Integration test with its own databases (API tests truncate seo_test in parallel).
-loadRootEnv();
-const DB_NAME = 'seo_worker_test';
-const testUrl = new URL(
-  process.env.TEST_DATABASE_URL ?? 'postgres://seo:seo@localhost:15432/seo_test',
-);
-const workerUrl = Object.assign(new URL(testUrl), { pathname: `/${DB_NAME}` }).toString();
-const chConfig = clickHouseConfigFromEnv(
-  parseEnv(clickhouseEnvSchema, { ...process.env, CLICKHOUSE_DATABASE: DB_NAME }),
-);
-
 let db: Database;
-let closeDb: () => Promise<void>;
 let ch: ClickHouseClient;
-const sent: { to: string | string[]; content: EmailContent }[] = [];
-const enqueued: { type: string; input: unknown; dedupeKey?: string }[] = [];
+let close: () => Promise<void>;
+const sent: TestEffects['sent'] = [];
+const enqueued: TestEffects['enqueued'] = [];
 
-function context(orgId: string | null): JobContext {
-  const logger = { child: () => logger, info: vi.fn(), warn: vi.fn(), error: vi.fn() };
-  const deps: WorkerDeps = {
-    db,
-    clickhouse: ch,
-    redis: {} as never,
-    providers: { serp: new MockProvider() } as never,
-    logger: logger as never,
-    mailer: { send: async (to, content) => void sent.push({ to, content }) },
-    appUrl: 'http://localhost:3000',
-    creditCosts: DEFAULT_CREDIT_COSTS,
-    enqueue: async (type, input, opts) => {
-      enqueued.push({ type, input, dedupeKey: opts.dedupeKey });
-      return randomUUID();
-    },
+/** Job context whose emails and enqueued jobs land in the shared arrays above. */
+function context(orgId: string | null) {
+  const { ctx, effects } = makeContext({ db, ch }, orgId);
+  effects.sent = sent;
+  effects.enqueued = enqueued;
+  ctx.deps.mailer = { send: async (to, content) => void sent.push({ to, content }) };
+  ctx.deps.enqueue = async (type, input, opts) => {
+    enqueued.push({ type, input, dedupeKey: opts.dedupeKey });
+    return randomUUID();
   };
-  return {
-    deps,
-    logger: logger as never,
-    progress: async () => undefined,
-    attempt: 1,
-    isFinalAttempt: true,
-    orgId,
-  };
+  return ctx;
 }
 
 const KEYWORDS = ['зъболекар софия', 'избелване на зъби', 'детски зъболекар', 'зъбни импланти'];
@@ -113,15 +71,7 @@ const input = (projectId: string): RankCheckJobInput => ({
 const today = () => new Date().toISOString().slice(0, 10);
 
 beforeAll(async () => {
-  const admin = createDb(Object.assign(new URL(testUrl), { pathname: '/postgres' }).toString(), {
-    max: 1,
-  });
-  const exists = await admin.db.execute(sql`select 1 from pg_database where datname = ${DB_NAME}`);
-  if (!exists.rows.length) await admin.db.execute(sql.raw(`create database ${DB_NAME}`));
-  await admin.close();
-  await runMigrations({ databaseUrl: workerUrl, clickhouse: chConfig, log: () => undefined });
-  ({ db, close: closeDb } = createDb(workerUrl, { max: 4 }));
-  ch = createClickHouse(chConfig);
+  ({ db, ch, close } = await setupTestDatabases('seo_worker_test'));
 }, 120_000);
 
 beforeEach(async () => {
@@ -133,8 +83,7 @@ beforeEach(async () => {
 });
 
 afterAll(async () => {
-  await closeDb?.();
-  await ch?.close();
+  await close?.();
 });
 
 describe('rankings.check', () => {

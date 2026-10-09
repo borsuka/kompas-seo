@@ -3,7 +3,9 @@ import type { Redis } from 'ioredis';
 import type { Logger } from 'pino';
 import { updateJob, type Database } from '@seo/db';
 import type { ClickHouseClient } from '@seo/db/clickhouse';
-import type { ProviderSet } from '@seo/data-providers';
+import type { Crawler } from '@seo/crawler';
+import type { GoogleOAuth, GscClient, ProviderSet } from '@seo/data-providers';
+import type { LLMProvider } from '@seo/llm';
 import {
   jobProgressChannel,
   type CreditCost,
@@ -25,6 +27,12 @@ export interface WorkerDeps {
   /** Public web URL for links in emails. */
   appUrl: string;
   creditCosts: Record<ProviderOperation, CreditCost>;
+  llm: LLMProvider;
+  crawler: Crawler;
+  /** Search Console: Google client + OAuth (when configured) and the mock. */
+  gsc: { google: GscClient; mock: GscClient; oauth: GoogleOAuth | null };
+  /** For decrypting stored OAuth tokens. */
+  encryptionKey: string;
   /**
    * Creates a tracked job (jobs row + BullMQ job) from inside the worker. With `dedupeKey`,
    * a job with the same key that is still queued or running is reused (returns null).
