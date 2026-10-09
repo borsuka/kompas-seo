@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { detectCannibalization } from './cannibalization.js';
 import { analyzeTopPages, normalizeHeading, type AnalyzedPage } from './content-analysis.js';
+import { templateBrief } from './content-brief.js';
 
 const page = (i: number, extra: Partial<AnalyzedPage> = {}): AnalyzedPage => ({
   url: `https://site${i}.bg/zabi`,
@@ -76,5 +77,33 @@ describe('detectCannibalization', () => {
     ]);
     expect(issues[1]!.pages.map((p) => p.page)).toEqual(['/c', '/d']);
     expect(issues[0]!.pages[0]!.share).toBeCloseTo(0.556, 2);
+  });
+});
+
+describe('templateBrief', () => {
+  const pages = Array.from({ length: 10 }, (_, i) => page(i + 1));
+  const analysis = analyzeTopPages(pages, 'избелване на зъби');
+
+  it('builds a localized outline from shared topics, terms and questions', () => {
+    const brief = templateBrief('избелване на зъби', analysis, {
+      language: 'bg',
+      intent: 'commercial',
+      questions: ['Колко струва избелването?', 'Колко струва избелването?', 'Боли ли?'],
+      year: 2026,
+    });
+    expect(brief.h1).toBe('Избелване на зъби');
+    expect(brief.titleOptions[0]).toContain('2026');
+    expect(brief.searchIntent).toBe('Търговско');
+    expect(brief.outline[0]!.heading).toBe('Въведение');
+    expect(brief.outline.map((o) => o.heading)).toEqual(
+      expect.arrayContaining(['Цени на избелването', 'Често задавани въпроси', 'Боли ли?']),
+    );
+    expect(brief.questions).toEqual(['Колко струва избелването?', 'Боли ли?']);
+    expect(brief.keyTerms).toContain('лазер');
+    expect(brief.wordCount.min).toBeGreaterThan(0);
+    expect(brief.metaDescription.length).toBeLessThanOrEqual(160);
+    expect(templateBrief('teeth whitening', analysis, { language: 'en' }).outline[0]!.heading).toBe(
+      'Introduction',
+    );
   });
 });

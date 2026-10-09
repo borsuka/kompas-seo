@@ -13,3 +13,4 @@ export * from './rankings.js';
 export * from './backlinks.js';
 export * from './content-analysis.js';
 export * from './cannibalization.js';
+export * from './content-brief.js';
