@@ -402,41 +402,36 @@ export class GscService {
       actual.set(row.query, (actual.get(row.query) ?? 0) + row.clicks);
     const perMonth = 30 / days;
 
-    // Prefer our own rank checks; fall back to the domain's organic keyword snapshot.
-    let source: Calibration['source'] = 'rank_tracking';
+    type Estimate = { keyword: string; position: number | null; volume: number };
+    const compare = (estimates: Estimate[]) =>
+      estimates
+        .filter((e) => actual.has(e.keyword))
+        .map((e) => ({
+          keyword: e.keyword,
+          position: e.position,
+          volume: e.volume,
+          estimatedClicks: Math.round(expectedClicks(e.position, e.volume) * 10) / 10,
+          actualClicks: Math.round((actual.get(e.keyword) ?? 0) * perMonth * 10) / 10,
+        }))
+        .sort((a, b) => b.actualClicks - a.actualClicks);
+
+    // Our own rank checks first; the domain's organic keyword snapshot when it overlaps more.
     const ranks = await rankHistory(this.ch, project.id, r.from);
     const latest = new Map<string, (typeof ranks)[number]>();
     for (const k of ranks) if (k.device === 'desktop') latest.set(k.keyword, k);
-    let estimates: { keyword: string; position: number | null; volume: number }[] = [
-      ...latest.values(),
-    ].map((k) => ({
-      keyword: k.keyword,
-      position: k.position,
-      volume: k.volume,
-    }));
-    if (!estimates.length) {
-      const loc: Locale = {
-        locationCode: project.locationCode,
-        languageCode: project.languageCode as Locale['languageCode'],
-      };
-      const snapshot = await latestDomainKeywords(this.ch, project.domain, loc, 'live', 30);
-      source = snapshot?.length ? 'domain_keywords' : 'none';
-      estimates = (snapshot ?? []).map((k) => ({
-        keyword: k.keyword,
-        position: k.position,
-        volume: k.volume,
-      }));
-    }
-    const rows = estimates
-      .filter((e) => actual.has(e.keyword))
-      .map((e) => ({
-        keyword: e.keyword,
-        position: e.position,
-        volume: e.volume,
-        estimatedClicks: Math.round(expectedClicks(e.position, e.volume) * 10) / 10,
-        actualClicks: Math.round((actual.get(e.keyword) ?? 0) * perMonth * 10) / 10,
-      }))
-      .sort((a, b) => b.actualClicks - a.actualClicks);
+    const fromRanks = compare([...latest.values()]);
+    const loc: Locale = {
+      locationCode: project.locationCode,
+      languageCode: project.languageCode as Locale['languageCode'],
+    };
+    const snapshot = await latestDomainKeywords(this.ch, project.domain, loc, 'live', 30);
+    const fromDomain = compare(snapshot ?? []);
+    const [source, rows]: [Calibration['source'], typeof fromRanks] =
+      fromRanks.length >= Math.min(20, fromDomain.length) && fromRanks.length > 0
+        ? ['rank_tracking', fromRanks]
+        : fromDomain.length
+          ? ['domain_keywords', fromDomain]
+          : ['none', []];
     const cal = calibrationFactor(rows);
     return {
       from: r.from,
