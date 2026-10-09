@@ -19,3 +19,4 @@ export type { Middleware, ProviderCall } from './middleware/types.js';
 export { MockProvider, type MockProviderOptions } from './mock/mock-provider.js';
 export { UNIVERSAL_DOMAINS } from './mock/vocab.js';
 export * from './dataforseo/index.js';
+export * from './gsc/index.js';
