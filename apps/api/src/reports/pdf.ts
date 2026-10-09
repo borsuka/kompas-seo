@@ -161,6 +161,8 @@ export class ReportPdf {
     const range = this.doc.bufferedPageRange();
     for (let i = range.start; i < range.start + range.count; i++) {
       this.doc.switchToPage(i);
+      // Writing below the bottom margin would make PDFKit start a new page.
+      this.doc.page.margins.bottom = 0;
       this.doc
         .font('regular')
         .fontSize(8)

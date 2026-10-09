@@ -45,6 +45,10 @@ describe('PDF reports', () => {
     expect(pdf.length).toBeGreaterThan(10_000);
     // The embedded font covers Cyrillic (PDFKit's built-in fonts do not).
     expect(pdf.toString('latin1')).toContain('DejaVuSans');
+    // Page footers must not spill onto extra blank pages.
+    const pages = Number(/\/Count (\d+)/.exec(pdf.toString('latin1'))?.[1] ?? 0);
+    expect(pages).toBeGreaterThan(0);
+    expect(pages).toBeLessThanOrEqual(3);
 
     // A second report reuses the stored research: no new credits.
     const before = (await owner.agent.get('/api/v1/credits').expect(200)).body.balance;

@@ -115,8 +115,13 @@ export class ReportsService {
       style: 'percent',
       maximumFractionDigits: 1,
     });
+    const dec = new Intl.NumberFormat(q.ui === 'bg' ? 'bg-BG' : 'en-GB', {
+      maximumFractionDigits: 1,
+    });
     const n = (v: number | null | undefined) =>
       v === null || v === undefined ? '–' : num.format(Math.round(v));
+    const pos = (v: number | null | undefined) =>
+      v === null || v === undefined ? '–' : dec.format(v);
 
     const overview = await this.domains.overview(ctx, {
       domain: q.domain,
@@ -158,7 +163,7 @@ export class ReportsService {
       .table(
         [
           { header: t.keyword, width: 4, value: (r) => r.keyword },
-          { header: t.position, width: 1, align: 'right', value: (r) => String(r.position) },
+          { header: t.position, width: 1, align: 'right', value: (r) => pos(r.position) },
           { header: t.volume, width: 1.4, align: 'right', value: (r) => n(r.volume) },
           { header: t.trafficCol, width: 1.4, align: 'right', value: (r) => n(r.traffic) },
         ],
@@ -204,7 +209,7 @@ export class ReportsService {
           { label: t.visibility, value: pct.format(ranks.visibility / 100) },
           {
             label: t.avgPosition,
-            value: ranks.avgPosition === null ? '–' : String(ranks.avgPosition),
+            value: pos(ranks.avgPosition),
           },
           { label: t.tracked, value: n(ranks.keywords) },
           { label: t.improved, value: `${ranks.improved} / ${ranks.declined}` },
@@ -216,7 +221,7 @@ export class ReportsService {
               header: t.position,
               width: 1.2,
               align: 'right',
-              value: (r) => (r.position === null ? '>100' : String(r.position)),
+              value: (r) => (r.position === null ? '>100' : pos(r.position)),
             },
             {
               header: t.change,
@@ -238,7 +243,7 @@ export class ReportsService {
           { label: t.ctr, value: pct.format(gsc.totals.ctr) },
           {
             label: t.avgPosition,
-            value: gsc.totals.position === null ? '–' : String(gsc.totals.position),
+            value: pos(gsc.totals.position),
           },
         ])
         .table(
@@ -246,7 +251,7 @@ export class ReportsService {
             { header: t.query, width: 4, value: (r) => r.key },
             { header: t.clicks, width: 1.2, align: 'right', value: (r) => n(r.clicks) },
             { header: t.impressions, width: 1.4, align: 'right', value: (r) => n(r.impressions) },
-            { header: t.position, width: 1.2, align: 'right', value: (r) => String(r.position) },
+            { header: t.position, width: 1.2, align: 'right', value: (r) => pos(r.position) },
           ],
           gsc.rows,
           t.none,
