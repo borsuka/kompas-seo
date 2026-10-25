@@ -25,21 +25,26 @@ export default defineConfig({
     screenshot: 'only-on-failure',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // Plain `node` commands, not `pnpm start`: on Linux the processes behind pnpm survived
+  // Playwright's shutdown and kept the run open until the CI job timed out.
   webServer: [
     {
-      command: 'pnpm --filter @seo/api start',
+      command: 'node --enable-source-maps dist/main.js',
+      cwd: '../api',
       url: 'http://localhost:14000/health/live',
       reuseExistingServer: true,
       timeout: 120_000,
     },
     {
-      command: 'pnpm --filter @seo/worker start',
+      command: 'node --enable-source-maps dist/main.js',
+      cwd: '../worker',
       url: 'http://localhost:4001/health/live',
       reuseExistingServer: true,
       timeout: 120_000,
     },
     {
-      command: 'pnpm --filter @seo/web start',
+      command: 'node scripts/next.mjs start --port 3000',
+      cwd: '.',
       url: baseURL,
       reuseExistingServer: true,
       timeout: 120_000,
