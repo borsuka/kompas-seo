@@ -103,7 +103,12 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: cp .env.example .env
+      - name: Configure environment
+        # Production mode refuses the example secrets, so generate fresh ones per run.
+        run: |
+          cp .env.example .env
+          echo "BETTER_AUTH_SECRET=$(openssl rand -base64 48)" >> "$GITHUB_ENV"
+          echo "ENCRYPTION_KEY=$(openssl rand -base64 32)" >> "$GITHUB_ENV"
       - run: pnpm build
       - run: pnpm db:migrate
       - run: pnpm --filter @seo/web exec playwright install --with-deps chromium

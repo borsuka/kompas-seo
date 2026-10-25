@@ -140,6 +140,15 @@ export const workerEnvSchema = commonEnvSchema
   });
 export type WorkerEnv = z.infer<typeof workerEnvSchema>;
 
+/**
+ * Placeholder secrets published in `.env.example`. Fine for local development, but anyone can
+ * read them in the public repository, so production refuses to start with them.
+ */
+const EXAMPLE_SECRETS: Record<string, string> = {
+  BETTER_AUTH_SECRET: 'change-me-dev-secret-at-least-32-characters-long',
+  ENCRYPTION_KEY: 'MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=',
+};
+
 /** Parses env with a readable, aggregated error message (fail fast at startup). */
 export function parseEnv<T extends z.ZodType>(
   schema: T,
@@ -149,6 +158,16 @@ export function parseEnv<T extends z.ZodType>(
   if (!result.success) {
     const lines = result.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`);
     throw new Error(`Invalid environment configuration:\n${lines.join('\n')}`);
+  }
+  const data = result.data as Record<string, unknown>;
+  if (data.NODE_ENV === 'production') {
+    const reused = Object.keys(EXAMPLE_SECRETS).filter((k) => data[k] === EXAMPLE_SECRETS[k]);
+    if (reused.length) {
+      const lines = reused.map(
+        (k) => `  - ${k}: the example value from .env.example cannot be used in production`,
+      );
+      throw new Error(`Invalid environment configuration:\n${lines.join('\n')}`);
+    }
   }
   return result.data;
 }
