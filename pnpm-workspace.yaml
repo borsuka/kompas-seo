@@ -10,7 +10,8 @@ allowBuilds:
   '@scarf/scarf': false
   '@parcel/watcher': true
   unrs-resolver: true
-  '@swc/core': set this to true or false
+  # Native binaries come as optional dependencies; the postinstall is only a fallback.
+  '@swc/core': false
 
 minimumReleaseAgeExclude:
   - '@next/env@16.4.0'
