@@ -14,7 +14,8 @@ const L = {
   bg: {
     title: 'SEO отчет',
     subtitle: (d: string) => `Органична видимост, беклинкове и позиции на ${d}`,
-    meta: (date: string, market: string) => `Изготвен на ${date} · пазар: ${market}`,
+    meta: (date: string, market: string, data: string) =>
+      `Изготвен на ${date} · пазар: ${market} · данни от ${data}`,
     footer: 'Kompas SEO',
     organic: 'Органична видимост',
     traffic: 'Органичен трафик/мес.',
@@ -53,7 +54,8 @@ const L = {
   en: {
     title: 'SEO report',
     subtitle: (d: string) => `Organic visibility, backlinks and rankings of ${d}`,
-    meta: (date: string, market: string) => `Generated on ${date} · market: ${market}`,
+    meta: (date: string, market: string, data: string) =>
+      `Generated on ${date} · market: ${market} · data from ${data}`,
     footer: 'Kompas SEO',
     organic: 'Organic visibility',
     traffic: 'Organic traffic/mo',
@@ -149,7 +151,12 @@ export class ReportsService {
       .cover(
         `${t.title}: ${q.domain}`,
         t.subtitle(q.domain),
-        t.meta(new Date().toISOString().slice(0, 10), `${market} · ${q.lang.toUpperCase()}`),
+        t.meta(
+          new Date().toISOString().slice(0, 10),
+          `${market} · ${q.lang.toUpperCase()}`,
+          // Read-only roles may get older stored research: say how old.
+          [overview.fetchedAt, links.fetchedAt].sort()[0]!.slice(0, 10),
+        ),
       )
       .heading(t.organic)
       .metrics([

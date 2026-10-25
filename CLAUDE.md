@@ -71,7 +71,7 @@ API integration tests (`apps/api/test`) need Postgres, ClickHouse and Redis from
 ## Domains and competitors (Phase 2)
 
 - API module: `apps/api/src/domains` (overview, organic keywords, top pages, competitor discovery, keyword gap, content gap). Algorithms live in `seo-core` (`competitors.ts`, `gap.ts`, `content-gap.ts`).
-- Domain snapshots (up to `DOMAIN_KEYWORD_LIMIT` keywords per domain, live and lost) and overviews are stored in ClickHouse (`domain-store.ts`) and reused for 7 days (`DOMAIN_FRESH_DAYS`), so gap analyses over the same domains are free after the first run.
+- Domain snapshots (up to `DOMAIN_KEYWORD_LIMIT` keywords per domain, live and lost) and overviews are stored in ClickHouse (`domain-store.ts`) and reused for 7 days (`DOMAIN_FRESH_DAYS`), so gap analyses over the same domains are free after the first run. Roles without `research:run` read the latest stored snapshot of any age (`STORED_MAX_DAYS`, also for backlinks) and get 403 only when nothing is stored.
 - Competitor discovery reads the top 20 for the project's 50 highest-volume keywords (charged as `keyword.clusterSerp` for SERPs not stored yet), counts shared domains, excludes universal sites (Wikipedia, YouTube, social networks) and caches the result in Redis for 7 days. Bump the cache key version when its shape changes.
 - Keyword gap categories are defined in `seo-core/gap.ts`; the tests in `apps/api/test/domains.test.ts` check every tab against its definition.
 - Web: `apps/web/src/app/[locale]/app/competitors/*`; table headers take `metric` for the info tooltip (never put `MetricLabel` inside a sortable header: nested buttons break hydration).

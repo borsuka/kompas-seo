@@ -45,6 +45,11 @@ import { MeteredProviders } from '../providers/metered-providers.service.js';
 
 /** Domain snapshots are reused for a week (matches the provider cache TTL). */
 export const DOMAIN_FRESH_DAYS = 7;
+/**
+ * Roles that cannot spend credits read the latest stored snapshot of any age (up to this),
+ * instead of being refused once the data is older than DOMAIN_FRESH_DAYS.
+ */
+export const STORED_MAX_DAYS = 365;
 /** Keywords fetched per domain snapshot (top by traffic). */
 export const DOMAIN_KEYWORD_LIMIT = 1000;
 /** Project keywords (top 20) whose SERPs are analysed for competitor discovery. */
@@ -139,6 +144,11 @@ export class DomainsService {
     }
   }
 
+  /** Fresh data for roles that can refetch it; any stored data for read-only roles. */
+  private maxAge(ctx: ResearchContext) {
+    return can(ctx.role, 'research:run') ? DOMAIN_FRESH_DAYS : STORED_MAX_DAYS;
+  }
+
   /** Stored snapshot if fresh, otherwise fetched (and charged) once and stored. */
   private async keywordsSnapshot(
     ctx: ResearchContext,
@@ -146,7 +156,7 @@ export class DomainsService {
     loc: Locale,
     mode: SnapshotMode,
   ) {
-    const stored = await latestDomainKeywords(this.ch, domain, loc, mode, DOMAIN_FRESH_DAYS);
+    const stored = await latestDomainKeywords(this.ch, domain, loc, mode, this.maxAge(ctx));
     if (stored) return { rows: stored, creditsCharged: 0 };
     this.assertCanSpend(ctx);
     const opts = { limit: DOMAIN_KEYWORD_LIMIT, offset: 0, mode };
@@ -159,7 +169,7 @@ export class DomainsService {
   async overview(ctx: ResearchContext, q: DomainLocaleQuery): Promise<DomainOverviewResponse> {
     const loc = toLocale(q);
     let creditsCharged = 0;
-    let stored = await latestDomainOverview(this.ch, q.domain, loc, DOMAIN_FRESH_DAYS);
+    let stored = await latestDomainOverview(this.ch, q.domain, loc, this.maxAge(ctx));
     if (!stored) {
       this.assertCanSpend(ctx);
       creditsCharged += this.metered.price('domains', 'getDomainOverview', q.domain, loc);

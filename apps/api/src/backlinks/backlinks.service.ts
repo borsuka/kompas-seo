@@ -35,6 +35,7 @@ import {
 } from '@seo/shared';
 import { AuditService } from '../audit/audit.service.js';
 import { CLICKHOUSE, DB } from '../infra/tokens.js';
+import { STORED_MAX_DAYS } from '../domains/domains.service.js';
 import type { ResearchContext } from '../keywords/keywords.service.js';
 import { ProjectsService } from '../projects/projects.service.js';
 import { MeteredProviders } from '../providers/metered-providers.service.js';
@@ -89,7 +90,9 @@ export class BacklinksService {
     ctx: ResearchContext,
     target: string,
   ): Promise<{ snap: BacklinkSnapshot; creditsCharged: number }> {
-    const stored = await latestBacklinkSnapshot(this.ch, target, BACKLINK_FRESH_DAYS);
+    // Read-only roles get the latest stored snapshot of any age instead of a refusal.
+    const maxAge = can(ctx.role, 'research:run') ? BACKLINK_FRESH_DAYS : STORED_MAX_DAYS;
+    const stored = await latestBacklinkSnapshot(this.ch, target, maxAge);
     if (stored) return { snap: stored, creditsCharged: 0 };
     this.assertCanSpend(ctx);
 
