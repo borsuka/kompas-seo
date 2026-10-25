@@ -15,7 +15,9 @@ export default defineConfig({
   timeout: 90_000,
   // Dev servers compile routes on first visit; allow for that.
   expect: { timeout: 15_000 },
-  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'list',
+  // A hung run should fail with a report before the CI job times out.
+  globalTimeout: process.env.CI ? 20 * 60_000 : undefined,
+  reporter: process.env.CI ? [['list'], ['github'], ['html', { open: 'never' }]] : 'list',
   use: {
     baseURL,
     locale: 'bg-BG',
